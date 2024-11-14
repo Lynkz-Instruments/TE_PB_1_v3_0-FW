@@ -4,7 +4,7 @@
 * @version 1.0
 * @date 2023-04-15
 * 
-* @copyright Copyright (c) 2023
+* @copyright Copyright (c) Lynkz Instruments Inc, Amos 2024
 * 
 */
 
@@ -42,87 +42,112 @@
 bool app_hdw_init(void);
 
 /**
- * @brief Function to set all the leds.
- * 
- */
-void app_hdw_set_leds(bool red, bool green, bool blue);
-
-/**
- * @brief Function to set red led.
- * 
- */
-void app_hdw_set_red_led(bool on);
-
-/**
- * @brief Function to set green led.
- * 
- */
-void app_hdw_set_green_led(bool on);
-
-/**
- * @brief Function to set blue led.
- * 
- */
-void app_hdw_set_blue_led(bool on);
-
-/**
- * @brief Function to power on/off LoRa radio.
- * 
- */
-void app_hdw_pwr_lora(bool state);
-
-/**
- * @brief Function to power on/off NOR flash and BMI.
- * 
- */
-void app_hdw_pwr_flash_bmi(bool state);
-
-/**
- * @brief Function to power on/off antenna assembly.
- * 
- */
-void app_hdw_pwr_antenna(bool state);
-
-/**
- * @brief Function to disconnect the LoRa UART pins.
- * 
- */
-void app_hdw_disconnect_lora_uart(void);
-
-/**
- * @brief Function to disconnect the SPI pins.
- * 
- */
-void app_hdw_disconnect_spi(void);
-
-/**
- * @brief Function to disconnect the I2C pins.
- * 
- */
-void app_hdw_disconnect_i2c(void);
-
-/**
- * @brief Function to set the GPIOs in low power mode.
- * 
- */
-void app_hdw_gpio_low_power(void);
-
-/**
- * @brief Function to know if the device is on a test board.
- * 
- */
-bool app_hdw_is_on_test_board(void);
-
-/**
- * @brief Function to disconnect the test board detect pin.
- * 
- */
-void app_hdw_disconnect_test_board_detect(void);
-
-/**
  * @brief Function to kick the watchdog.
  * 
  */
 void app_hdw_wdt_kick(void);
+
+/**
+ * @brief Function to configure the board for certain modes.
+ * 
+ */
+void app_hdw_select_mode();
+
+/**
+ * @brief Function to select the device to communicate with.
+ * 
+ */
+void app_hdw_select_UART();
+
+/**
+ * @brief Function to set the 1st analog switch.
+ * 
+ */
+void app_hdw_set_analog_switch1(bool on);
+
+/**
+ * @brief Function to set the 2nd analog switch.
+ * 
+ */
+void app_hdw_set_analog_switch2(bool on);
+
+/**
+ * @brief Function to set the 3rd analog switch.
+ * 
+ */
+void app_hdw_set_analog_switch3(bool on);
+
+/**
+ * @brief Function to set the 4th and the 5th analog switch.
+ * 
+ */
+void app_hdw_set_analog_switch4_5(bool on);
+
+/**
+ * @brief Function to set the 6th analog switch.
+ * 
+ */
+void app_hdw_set_analog_switch6(bool on);
+
+/**
+ * @brief Function to set the internal STARTCO led.
+ * 
+ */
+void app_hdw_set_INT_STCO_led(bool on);
+
+/**
+ * @brief Function to set the Bavard led.
+ * 
+ */
+void app_hdw_set_INT_BV_led(bool on);
+
+/**
+ * @brief Function to set the 1st uart multiplexer led.
+ * 
+ */
+void app_hdw_set_UART1_led(bool on);
+
+/**
+ * @brief Function to set the 2nd uart multiplexer led.
+ * 
+ */
+void app_hdw_set_UART2_led(bool on);
+
+/**
+ * @brief Function to set the low battery power led.
+ * 
+ */
+void app_hdw_set_low_bat_led(bool on);
+
+/**
+ * @brief Function to set the power output to power the TAG.
+ * 
+ */
+void app_hdw_set_TAG_pwr(bool on);
+
+/**
+ * @brief Function to read the mode button and change the mode value.
+ * 
+ */
+void app_hdw_read_mode_BTN();
+
+/**
+ * @brief Function to read the UART button and change the UART device.
+ * 
+ */
+void app_hdw_read_UART_BTN();
+
+/**
+ * @brief Function to indicate the battery's state.
+ * 
+ */
+void app_hdw_read_V_BAT();
+
+/**
+ * @brief Function to detect a TAG's presence and ensure it is powered.
+ * 
+ */
+void app_hdw_detect_TAG();
+
 
 #endif // APP_HARDWARE_H
