@@ -15,17 +15,6 @@
 #include <stdint.h>
 #include "sdk_errors.h"
 
-/**
- * @brief Function to init UART module for LoRa radio.
- *
- */
-ret_code_t app_uart_module_init_lora(void);
-
-/**
- * @brief Function to init UART module for test board.
- *
- */
-ret_code_t app_uart_module_init_test_board(void);
 
 /**
  * @brief Function to write on UART TX buffer.
