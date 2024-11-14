@@ -1,0 +1,3 @@
+[submodule "TE_PB_1/Lynkz_Library"]
+	path = TE_PB_1/Lynkz_Library
+	url = git@github.com:Lynkz-Instruments/Lynkz_Library.git
