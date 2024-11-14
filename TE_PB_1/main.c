@@ -56,7 +56,6 @@ int main(void)
 
     struct app_test_data_t test_data = {0};
     app_peripherals_self_test(&test_data);
-    app_peripherals_send_test_results(&test_data);
     
     while(1){
       app_hdw_set_leds(false, false, false);

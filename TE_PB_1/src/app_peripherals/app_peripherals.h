@@ -72,22 +72,5 @@ struct app_test_data_t{
  */
 bool app_peripherals_self_test(struct app_test_data_t * test_data);
 
-/**
- * @brief Function to send the selftest results to the test board.
- *
- */
-void app_peripherals_send_test_results(struct app_test_data_t * test_data);
-
-/**
- * @brief Function to perform a data record session.
- *
- */
-void app_peripherals_get_data(struct app_packet_t * data, uint16_t record_id, uint16_t record_time_sec);
-
-/**
- * @brief Function to power off all the peripherals.
- *
- */
-void app_peripherals_system_off(void);
 
 #endif // APP_PERIPHERALS

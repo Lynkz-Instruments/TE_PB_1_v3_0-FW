@@ -104,9 +104,6 @@ static void device_deep_sleep(void)
   // Empty the LOG Buffer
   while( NRF_LOG_PROCESS() );
 
-  // Prepare all peripherals for system off mode
-  app_peripherals_system_off();
-
   // Set device to System OFF mode
   nrf_pwr_mgmt_shutdown(NRF_PWR_MGMT_SHUTDOWN_GOTO_SYSOFF);
 }
