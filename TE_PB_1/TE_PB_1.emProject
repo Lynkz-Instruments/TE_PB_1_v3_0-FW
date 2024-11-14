@@ -100,23 +100,6 @@
       <file file_name="config/sdk_config.h" />
     </folder>
     <folder Name="Lynkz_Library">
-      <folder Name="drivers">
-        <folder Name="lora_at_master">
-          <file file_name="Lynkz_Library/drivers/lora_at_master/lora_at_master.c" />
-          <file file_name="Lynkz_Library/drivers/lora_at_master/lora_at_master.h" />
-        </folder>
-        <folder Name="mx25r">
-          <configuration Name="Debug" build_exclude_from_build="No" />
-          <file file_name="Lynkz_Library/drivers/mx25r/mx25r.c" />
-          <file file_name="Lynkz_Library/drivers/mx25r/mx25r.h" />
-          <file file_name="Lynkz_Library/drivers/mx25r/mx25r_nrf5.c" />
-          <file file_name="Lynkz_Library/drivers/mx25r/mx25r_nrf5.h" />
-        </folder>
-        <folder Name="tsys02d">
-          <file file_name="Lynkz_Library/drivers/tsys02d/tsys02d.c" />
-          <file file_name="Lynkz_Library/drivers/tsys02d/tsys02d.h" />
-        </folder>
-      </folder>
       <folder Name="peripherals">
         <folder Name="ble_nrf">
           <configuration Name="Debug" build_exclude_from_build="No" />
