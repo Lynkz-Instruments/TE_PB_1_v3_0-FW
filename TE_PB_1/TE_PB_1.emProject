@@ -101,10 +101,6 @@
     </folder>
     <folder Name="Lynkz_Library">
       <folder Name="drivers">
-        <folder Name="ldc1614">
-          <file file_name="Lynkz_Library/drivers/ldc1614/ldc1614.c" />
-          <file file_name="Lynkz_Library/drivers/ldc1614/ldc1614.h" />
-        </folder>
         <folder Name="lora_at_master">
           <file file_name="Lynkz_Library/drivers/lora_at_master/lora_at_master.c" />
           <file file_name="Lynkz_Library/drivers/lora_at_master/lora_at_master.h" />
