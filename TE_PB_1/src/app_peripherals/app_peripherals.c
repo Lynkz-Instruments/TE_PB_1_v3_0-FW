@@ -173,42 +173,6 @@ bool app_peripherals_self_test(struct app_test_data_t * test_data)
   #endif
   /************************************ Testing BLE - END *************************************/
 
-  /******************************** Testing LoRa Device - START ********************************/
-  
-  // Test LoRa Radio
-  uint8_t retry = 0;
-  ret_code_t lora_rslt = NRF_ERROR_INVALID_STATE; 
-  if (app_lora_init_uart() == NRF_SUCCESS){
-    // Loop to obtain the devEUI. Sometimes, the LoRa radio answer Ok 
-    // when getting the devEUI.
-    // ST50H_reset(LORA_RST_PIN);
-
-    // Let ST50H boot message happen before initializing serial
-    // nrf_delay_ms(2000);
-
-    do{
-      lora_rslt = app_lora_getdeveui(test_data->lora_deveui);
-      if (strstr(test_data->lora_deveui, "Ok") == NULL && strlen(test_data->lora_deveui) != 0 && lora_rslt == NRF_SUCCESS){
-        break;
-      }
-      retry+=1;
-    }
-    while(retry < 5);
-
-    if (lora_rslt == NRF_SUCCESS){
-      NRF_LOG_INFO("LoRa Get DevEUI Success!...... 6/6 Test Passed");
-      test_data->lora_ok = true;
-      test_data->uart_ok = true;
-    }
-    else{
-      NRF_LOG_ERROR("LoRa Get DevEUI Failed");
-      test_data->lora_ok = false;
-      rslt = false;
-    }
-  }
-  app_lora_uninit_uart();
-  
-  /******************************** Testing LoRa Device - END **********************************/
   return rslt;
 }
 

@@ -97,17 +97,7 @@ int main(void)
   // Start application execution. 
   NRF_LOG_INFO("INIT DONE: SMARTLINER APP STARTED!");
   
-  #if APP_LORA == 1
-  // LoRa init 
-  app_lora_init(true);
-  // Send power on packet
-  app_lora_send_start();
-  // Sending app version.
-  if(app_lora_joined()){
-    app_lora_send_version();
-  }
-  app_lora_sleep();
-  #endif
+
 
   if (!is_ble_user_connected()){
     advertising_stop();

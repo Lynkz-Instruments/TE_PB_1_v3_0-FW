@@ -94,14 +94,6 @@
             <configuration Name="Debug" build_exclude_from_build="No" />
           </file>
         </folder>
-        <folder Name="app_lora">
-          <file file_name="src/app_lora/app_lora.c">
-            <configuration Name="Debug" build_exclude_from_build="No" />
-          </file>
-          <file file_name="src/app_lora/app_lora.h">
-            <configuration Name="Debug" build_exclude_from_build="No" />
-          </file>
-        </folder>
         <folder Name="app_saadc">
           <file file_name="src/app_saadc/app_saadc.c" />
           <file file_name="src/app_saadc/app_saadc.h" />

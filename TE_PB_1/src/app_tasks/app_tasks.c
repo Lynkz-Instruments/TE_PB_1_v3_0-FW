@@ -66,42 +66,7 @@ bool app_task_is_advertising(void)
 static void task_send_heart_beat(void)
 { 
   NRF_LOG_INFO("### SENDING HEART BEAT ###");
-  if (app_lora_joined()){
-    // Getting current device configuration.
-    struct app_config_t config = {0};
-    app_settings_get_configuration((uint8_t *)&config);
-    
-    // Prepare the packet to be send by LoRa.
-    uint8_t data[sizeof(uint8_t) + sizeof(struct app_config_t) + sizeof(uint8_t)] = {0};
 
-    // Getting flash usage percentage. 
-    // This will get the number of block (sectors) used by littlefs divided by the number of block allowed by littlfs.
-    app_flash_enable();
-    data[0] = app_flash_get_percentage();
-    app_flash_disable();
-
-    // Writing the config in the buffer.
-    memcpy(&data[1], &config, sizeof(struct app_config_t));
-
-    // Getting battery voltage.
-    nrf_saadc_value_t battery = 0;
-    app_saadc_init();
-    app_saadc_get_channel(3, &battery);
-    app_saadc_uninit();
-    
-    float battery_v = ((battery * 0.6f) / 4096.0f) * 6.0f;
-    uint8_t battery_data = (uint8_t)(battery_v * 10);
-
-    NRF_LOG_INFO("Battery ADC: %d", battery);
-    NRF_LOG_INFO("Battery voltage: %d", battery_data);
-
-    data[17] = battery_data;
-    
-    // Send heart beat.
-    app_lora_wakeup();
-    app_lora_send_heartbeat(data, sizeof(uint8_t) + sizeof(struct app_config_t) + sizeof(uint8_t), true);
-    app_lora_sleep();
-  }
   app_hdw_wdt_kick();
   app_hdw_gpio_low_power(); // Sleep
 }
@@ -141,38 +106,7 @@ static void task_perform_fft(void)
   app_flash_close_fft_session(); // Closing the FFT session.
   app_flash_disable(); // Disabling flash and unmount littlefs.
   
-  // The FFT will be sent by LoRa only if BLE user is disconnected.
-  // This way, the user can download the FFTs directly after to be able to show them.
-  if(!ble_user_connected){ 
-    if (app_lora_joined()){
-      // Send FFT by LoRa.
-      app_lora_wakeup();
-    
-      // Buffer for FFT packet
-      uint16_t data[LORA_FFT_PACKET_COUNT] = {0};
 
-      // The FFT result is sent by 116 bytes + 6 bytes overhead chunks (122 bytes total). 
-      // The whole FFT is sent using 18 chunks.
-      uint32_t data_cursor = 0;
-      uint8_t chunk_id = 0;
-      while(data_cursor < FFT_SIZE/2){
-        for(uint8_t i = 0; i < LORA_FFT_PACKET_COUNT; ++i){
-          if(data_cursor < FFT_SIZE/2){
-            data[i] = mean_fft_buffer[data_cursor];
-            data_cursor++;
-          }
-          else{
-            data[i] = 0;
-          }
-        }
-        NRF_LOG_INFO("Sending chunk %d", chunk_id);
-        app_lora_send_fft_pkt(fft_id, chunk_id, fft_gain, fft_freq, (uint8_t *)data, 2 * LORA_FFT_PACKET_COUNT, false);
-        chunk_id++;
-        app_hdw_wdt_kick();
-      }
-      app_lora_sleep();
-    }
-  }
   app_hdw_wdt_kick();
   app_comm_send_response();
   app_hdw_gpio_low_power();
@@ -194,15 +128,7 @@ static void task_vibration_analysis(void)
   NRF_LOG_INFO("Vibration data file size: %d", file_size);
   if(file_size >= VIBRATION_DATA_COUNT * sizeof(uint16_t)){
     // Send the data by LoRa.
-    if(app_lora_joined()){
-      // Prepare data packet.
-      uint8_t data[sizeof(uint16_t) * VIBRATION_DATA_COUNT] = {0};
-      app_flash_get_vibration_data(data, sizeof(uint16_t) * 10);
 
-      app_lora_wakeup();
-      app_lora_send_vibration_data_pkt(TASK_VIBRATION_ANALYSIS_PERIOD, data, sizeof(uint16_t) * VIBRATION_DATA_COUNT, true);
-      app_lora_sleep();
-    }
 
     // Remove the vibration data file.
     app_flash_remove_vibration_data();
@@ -232,15 +158,7 @@ static void data_gathering(uint16_t record_duration)
   app_flash_disable(); // Disable NOR flash and littlefs.
   
   // Sending result by LoRa.
-  if (app_lora_joined()){
-    uint8_t data[sizeof(struct app_packet_t)] = {0};
-    memcpy(&data[0], &sensor_data, sizeof(struct app_packet_t));
-
-    app_lora_wakeup();
-    app_lora_send_data_pkt(data, sizeof(struct app_packet_t), true);
-    app_lora_sleep();
-  }
-
+ 
   app_hdw_wdt_kick();
   app_hdw_gpio_low_power();
 }
