@@ -70,10 +70,6 @@
           <file file_name="src/app_saadc/app_saadc.c" />
           <file file_name="src/app_saadc/app_saadc.h" />
         </folder>
-        <folder Name="app_spi">
-          <file file_name="src/app_spi/app_spi.c" />
-          <file file_name="src/app_spi/app_spi.h" />
-        </folder>
         <folder Name="app_uart">
           <file file_name="src/app_uart/app_uart_module.c" />
           <file file_name="src/app_uart/app_uart_module.h" />
