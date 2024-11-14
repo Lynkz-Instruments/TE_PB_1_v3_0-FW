@@ -101,18 +101,6 @@
     </folder>
     <folder Name="Lynkz_Library">
       <folder Name="drivers">
-        <folder Name="bmi270">
-          <configuration Name="Debug" build_exclude_from_build="No" />
-          <file file_name="Lynkz_Library/drivers/bmi270/bmi2.c">
-            <configuration Name="Debug" build_exclude_from_build="No" />
-          </file>
-          <file file_name="Lynkz_Library/drivers/bmi270/bmi2.h" />
-          <file file_name="Lynkz_Library/drivers/bmi270/bmi270.c" />
-          <file file_name="Lynkz_Library/drivers/bmi270/bmi270.h" />
-          <file file_name="Lynkz_Library/drivers/bmi270/bmi270_nrf5.c" />
-          <file file_name="Lynkz_Library/drivers/bmi270/bmi270_nrf5.h" />
-          <file file_name="Lynkz_Library/drivers/bmi270/bmi2_defs.h" />
-        </folder>
         <folder Name="ldc1614">
           <file file_name="Lynkz_Library/drivers/ldc1614/ldc1614.c" />
           <file file_name="Lynkz_Library/drivers/ldc1614/ldc1614.h" />
