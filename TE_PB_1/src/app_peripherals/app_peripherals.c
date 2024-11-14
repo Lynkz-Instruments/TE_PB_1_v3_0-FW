@@ -251,12 +251,6 @@ void app_peripherals_get_data(struct app_packet_t * data, uint16_t record_id, ui
       sens_data.err_chan_0 = freq_0_error_mask;
       sens_data.err_chan_1 = freq_1_error_mask;
       
-
-      // Save this packet in flash
-      if (!app_flash_record_data_packet((uint8_t *)&sens_data, sizeof(sens_data))){
-        NRF_LOG_ERROR("Error writing data packet to file.");
-      }
-
       app_hdw_wdt_kick();
 
       // Wait Sampling Rate Delay

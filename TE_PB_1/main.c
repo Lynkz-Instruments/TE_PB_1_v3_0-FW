@@ -70,14 +70,8 @@ int main(void)
 
   // Getting config from NOR flash.
   #if FLASH_RESET > 0
-  app_flash_set_default_config();
-  // app_nfc_wakeup_save_uicr();
-  app_flash_enable();
-  app_flash_remove_data_sessions();
-  app_flash_remove_fft_sessions();
-  app_flash_disable();
+
   #endif
-  app_flash_import_config();
 
   #if MAIN_VERBOSE >= 2
   // Showing configuration for debugging purpose.

@@ -73,71 +73,14 @@ static void task_send_heart_beat(void)
 
 static void task_perform_fft(void)
 {
-  NRF_LOG_INFO("### FFT ###");
-  uint16_t mean_fft_buffer[FFT_SIZE/2] = {0}; // FFT_COMPUTE_LEN/2 because only need the Real side of the fft
-
-  app_flash_enable(); // Enabling NOR flash and littlefs.
-  // Remove fft_data file.
-  app_flash_remove_fft_data();
-  
-  // Write the 4096 bytes FFT result in the file.
-  uint8_t buffer[FFT_FLASH_WRITE_SIZE] = {0};
-  for (uint16_t i = 0; i < FFT_SIZE / FFT_FLASH_WRITE_SIZE; ++i){
-    memcpy(buffer, (uint8_t *)&mean_fft_buffer[i * (FFT_FLASH_WRITE_SIZE / 2)], FFT_FLASH_WRITE_SIZE);
-    app_flash_record_fft_packet(buffer, FFT_FLASH_WRITE_SIZE);
-  }
-
-  app_flash_close_fft_session(); // Closing the FFT session.
-  app_flash_disable(); // Disabling flash and unmount littlefs.
-  
-
-  app_hdw_wdt_kick();
-  app_comm_send_response();
-  app_hdw_gpio_low_power();
 }
 
 static void task_vibration_analysis(void)
 {
-  NRF_LOG_INFO("### VIBRATION ANALYSIS TASK ###");
-
-  // If vibration data filled with 10 measures, send the data by LoRa.
-  uint32_t file_size = app_flash_get_vibration_data_size();
-  NRF_LOG_INFO("Vibration data file size: %d", file_size);
-  if(file_size >= VIBRATION_DATA_COUNT * sizeof(uint16_t)){
-    // Send the data by LoRa.
-
-
-    // Remove the vibration data file.
-    app_flash_remove_vibration_data();
-  }
-
-  app_flash_disable();
-
-  app_hdw_wdt_kick();
-  app_hdw_gpio_low_power();
 }
 
 static void data_gathering(uint16_t record_duration)
 {
-  struct app_packet_t sensor_data = {0};
-
-  app_flash_enable(); // Enabling NOR flash and littlfs.
-  uint16_t session_id = 0;
-  if(!app_flash_create_data_session(&session_id)){ // Create a new session of data.
-    NRF_LOG_ERROR("Error creating data session.");
-  }
-  NRF_LOG_INFO("Session id: %d", session_id);
-  // Recording data. This will be performed even if there was an error with flash initialization
-  // or session creation. The data will be sent by LoRa anyway. In case of a fail, the data 
-  // will still be sent but with a record id of 0.
-  app_peripherals_get_data(&sensor_data, session_id, record_duration); 
-  app_flash_close_data_session(); // Closing data session.
-  app_flash_disable(); // Disable NOR flash and littlefs.
-  
-  // Sending result by LoRa.
- 
-  app_hdw_wdt_kick();
-  app_hdw_gpio_low_power();
 }
 
 static void task_send_data(void)
@@ -156,7 +99,6 @@ static void task_save_config(void)
     APP_ERROR_CHECK(nrf_sdh_disable_request());
     need_reset = true;
   }
-  app_flash_save_config();
   
   NRF_LOG_INFO("The device will reset.");
   nrf_delay_ms(100);
@@ -167,238 +109,36 @@ static void task_save_config(void)
   
   SCH_Modify_Task(task_send_heart_beat, 0, SEC_TO_TICK(app_settings_get_lora_heartbeat_period_minutes() * 60), true); // Reset the heartbeat task.
   SCH_Modify_Task(task_send_data, SEC_TO_TICK(app_settings_get_record_period_minutes() * 60), SEC_TO_TICK(app_settings_get_record_period_minutes() * 60), false); // Reset the data record task.
-  // If this config is set at 0, don't start automatically the task.
-  // A request can be manualy done to perform an FFT.
-  if (app_settings_get_fft_period_hours() != 0){
-    SCH_Modify_Task(task_perform_fft, SEC_TO_TICK(app_settings_get_fft_period_hours() * 3600), SEC_TO_TICK(app_settings_get_fft_period_hours() * 3600), false); // Reset the fft task.
-  }
+
   app_hdw_wdt_kick();
 }
 
 static void task_download_data_ble(void)
 {
-  NRF_LOG_INFO("### DOWNLOAD DATA TASK ###");
-  
-  if (app_flash_enable()){
-    uint32_t total_data_count = app_flash_get_data_session_count();
-    uint8_t data_file_count = (uint8_t) (total_data_count / FILE_RECORD_COUNT) + 1;
-  
-    // If total data count is greater than 0, proceed to download.
-    // If there's no data at all, there's no file too.
-    if (total_data_count > 0){ 
-      // For each file.
-      for (uint8_t i = 0; i < data_file_count; ++i){
-        uint32_t data_count = 0;
-
-        // Open the data file and get the number of data inside the file.
-        if (app_flash_download_data_file_start(i, &data_count)){
-    
-          uint8_t buffer[sizeof(struct app_packet_t)] = {0};
-          for(uint32_t j = 0; j < data_count; ++j){
-            // Downloading the packet at specific index.
-            if (app_flash_download_data(j, buffer, sizeof(struct app_packet_t))){
-              struct app_packet_t packet = {0};
-              memcpy(&packet, buffer, sizeof(struct app_packet_t));
-              NRF_LOG_INFO("Download %d: %d", j, packet.record_id);
-              app_comm_send_packet(buffer, sizeof(struct app_packet_t));
-            }
-            else{
-              // If there a problem downloading the data,
-              // send a fail by BLE.
-              NRF_LOG_ERROR("Unable to download data (index: %d)", j);
-              app_comm_send_fail();
-            }
-            app_hdw_wdt_kick();
-          }
-          app_flash_download_data_file_stop();
-        }
-      }
-    }
-  }
-  else{
-    NRF_LOG_ERROR("Error initializing NOR flash.");
-    app_comm_send_fail();
-  }
-  app_flash_disable();
-  app_comm_send_response();
-  app_hdw_gpio_low_power();
 }
 
 static void task_download_fft_ble(void)
 {
-  NRF_LOG_INFO("### DOWNLOAD FFT TASK ###");
-  if (app_flash_enable()){
-    uint32_t total_fft_count = app_flash_get_fft_session_count();
-    uint8_t fft_file_count = (uint8_t) (total_fft_count / FFT_FILE_RECORD_COUNT) + 1;
-  
-    // If total data count is greater than 0, proceed to download.
-    // If there's no fft at all, there's no file too.
-    if (total_fft_count > 0){ 
-      // For each fft file.
-      for (uint8_t i = 0; i < fft_file_count; ++i){
-        uint32_t fft_count = 0;
-        // Open the data file and get the number of fft inside the file.
-        if (app_flash_download_fft_file_start(i, &fft_count)){
-          // For each fft.
-          uint32_t fft_header_start = 0;
-          for(uint32_t j = 0; j < fft_count; ++j){ 
-            // Downloading the packet at specific index.
-            // Getting fft header.
-            struct app_fft_header_t header = {0};
-            fft_header_start = (j * (FFT_SIZE + sizeof(struct app_fft_header_t)));
-            if(app_flash_download_fft(fft_header_start, (uint8_t *)&header, sizeof(struct app_fft_header_t))){
-              NRF_LOG_INFO("Download header %d: %d", j, header.fft_id);
-              app_comm_send_packet((uint8_t *)&header, sizeof(struct app_fft_header_t));
-            }
-            else{
-              // If there a problem downloading the data,
-              // send a fail by BLE.
-              NRF_LOG_ERROR("Unable to get FFT header (index: %d)", j);
-              app_comm_send_fail();
-            }
-            
-            // Getting FFT data.
-            uint8_t buffer[BLE_FFT_PACKET_SIZE] = {0};
-            uint32_t fft_data_start = 0;
-            for(uint32_t k = 0; k < FFT_SIZE / BLE_FFT_PACKET_SIZE; ++k){
-              fft_data_start = (j * (FFT_SIZE + sizeof(struct app_fft_header_t))) + sizeof(struct app_fft_header_t);
-              if(app_flash_download_fft(fft_data_start + (k * BLE_FFT_PACKET_SIZE), buffer, sizeof(buffer))){
-                NRF_LOG_INFO("Download fft data %d: %d", j, k);
-                app_comm_send_packet(buffer, sizeof(buffer));
-              }
-              else{
-                // If there a problem downloading the data,
-                // send a fail by BLE.
-                NRF_LOG_ERROR("Unable to get FFT data (index: %d)", k);
-                app_comm_send_fail(); // Sending fail.
-              }
-            }
-            app_hdw_wdt_kick();
-          }
-          app_flash_download_fft_file_stop();
-        }
-      }
-    }
-  }
-  else{
-    NRF_LOG_ERROR("Error initializing NOR flash.");
-    app_comm_send_fail(); // Sending fail.
-  }
-  app_flash_disable();
-  app_comm_send_response();
-  app_hdw_gpio_low_power();
 }
 
 static void task_get_session_count(void)
 {
-  NRF_LOG_INFO("### GET SESSION COUNT TASK ###");
-  uint16_t count = 0;
-  if(app_flash_enable()){ // Enable NOR flash and littlefs.
-    count = app_flash_get_data_session_count(); // Getting number of data sessions.
-  }
-  else{
-    NRF_LOG_ERROR("Error initializing NOR flash.");
-    app_comm_send_fail(); // Sending fail.
-  }
-  app_flash_disable(); // Disable NOR flash and littlefs.
-
-  // Prepare data to send by BLE.
-  uint8_t data[sizeof(count)] = {0};
-  memcpy(data, &count, sizeof(count));
-
-  // Sending result.
-  app_comm_send_packet((uint8_t *)&count, sizeof(count)); 
-
-  // Sending done.
-  app_comm_send_response();
-  
-  // Kicking watchdog.
-  app_hdw_wdt_kick();
 }
 
 static void task_get_fft_count(void)
 {
-  NRF_LOG_INFO("### GET FFT COUNT TASK ###");
-  uint16_t count = 0;
-  if(app_flash_enable()){ // Enable NOR flash and littlefs.
-    count = app_flash_get_fft_session_count(); // Getting number of data sessions.
-  }
-  else{
-    NRF_LOG_ERROR("Error initializing NOR flash.");
-    app_comm_send_fail(); // Sending fail.
-  }
-  app_flash_disable(); // Disable NOR flash and littlefs.
-
-  // Prepare data to send by BLE.
-  uint8_t data[sizeof(count)] = {0};
-  memcpy(data, &count, sizeof(count));
-
-  // Sending result.
-  app_comm_send_packet((uint8_t *)&count, sizeof(count)); 
-
-  // Sending done.
-  app_comm_send_response();
-  
-  // Kicking watchdog.
-  app_hdw_wdt_kick();
 }
 
 static void task_erase_all(void)
 {
-  NRF_LOG_INFO("### ERASE ALL TASK ###");
-  if(app_flash_enable()){ // Enable NOR flash and littlefs.
-    app_flash_erase_all(); // Erasing all the NOR flash.
-  }
-  else{
-    NRF_LOG_ERROR("Error initializing NOR flash.");
-    app_comm_send_fail(); // Sending fail.
-  }
-  app_flash_disable(); // Disable NOR flash and littlefs.
-
-  // Sending done.
-  app_comm_send_response();
-
-  // Kicking watchdog.
-  app_hdw_wdt_kick();
 }
 
 static void task_erase_data(void)
 {
-  NRF_LOG_INFO("### ERASE DATA TASK ###");
-  if(app_flash_enable()){ // Enable NOR flash and littlefs.
-    app_flash_remove_data_sessions(); // Removing data files.
-  }
-  else{
-    NRF_LOG_ERROR("Error initializing NOR flash.");
-    app_comm_send_fail(); // Sending fail.
-  }
-  app_flash_disable(); // Disable NOR flash and littlefs.
-
-  // Sending done.
-  app_comm_send_response();
-
-  // Kicking watchdog.
-  app_hdw_wdt_kick();
 }
 
 static void task_erase_fft(void)
 {
-  NRF_LOG_INFO("### ERASE FFT TASK ###");
-  if(app_flash_enable()){ // Enable NOR flash and littlefs.
-    app_flash_remove_fft_sessions(); // Removing FFT files.
-  }
-  else{
-    NRF_LOG_ERROR("Error initializing NOR flash.");
-    app_comm_send_fail(); // Sending fail.
-  }
-
-  app_flash_disable(); // Disable NOR flash and littlefs.
-
-  // Sending done.
-  app_comm_send_response();
-
-  // Kicking watchdog.
-  app_hdw_wdt_kick();
 }
 
 static void task_flash_led(void)
