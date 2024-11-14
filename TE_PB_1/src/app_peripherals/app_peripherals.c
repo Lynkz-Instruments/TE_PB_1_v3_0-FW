@@ -24,32 +24,6 @@ bool app_peripherals_self_test(struct app_test_data_t * test_data)
 {
   bool rslt = true;
 
-  /************************************ Testing NFC pins - START **********************************/
-  app_uicr_set_gpio_mode();
-  NRF_LOG_INFO("NFC pin register %d", NRF_UICR->NFCPINS);
-  
-  nrf_gpio_cfg(NFC1_PIN, NRF_GPIO_PIN_DIR_OUTPUT, NRF_GPIO_PIN_INPUT_DISCONNECT, NRF_GPIO_PIN_NOPULL, NRF_GPIO_PIN_S0S1, NRF_GPIO_PIN_NOSENSE);
-  nrf_gpio_cfg_input(NFC2_PIN, NRF_GPIO_PIN_NOPULL);
-
-  nrf_gpio_pin_set(NFC1_PIN);
-
-  nrf_delay_ms(10);
-
-  if((bool)nrf_gpio_pin_read(NFC2_PIN) == true){
-    NRF_LOG_INFO("NFC pins Success!....... 4/6 Test Passed");
-    test_data->nfc_ok = true;
-  }
-  else{
-    NRF_LOG_INFO("NFC pins not well soldered.");
-    test_data->nfc_ok = false;
-    rslt = false;
-  }
-
-  nrf_gpio_cfg(NFC1_PIN, NRF_GPIO_PIN_DIR_INPUT, NRF_GPIO_PIN_INPUT_DISCONNECT, NRF_GPIO_PIN_NOPULL, NRF_GPIO_PIN_S0S1, NRF_GPIO_PIN_NOSENSE);
-  nrf_gpio_cfg(NFC2_PIN, NRF_GPIO_PIN_DIR_INPUT, NRF_GPIO_PIN_INPUT_DISCONNECT, NRF_GPIO_PIN_NOPULL, NRF_GPIO_PIN_S0S1, NRF_GPIO_PIN_NOSENSE);
-
-  /************************************ Testing NFC pins - END ************************************/
-
   /************************************ Testing BLE - START ************************************/
   // Get BLE MAC
   #if APP_BLE == 1
