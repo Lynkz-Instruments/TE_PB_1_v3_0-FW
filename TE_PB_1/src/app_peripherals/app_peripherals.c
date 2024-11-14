@@ -24,51 +24,6 @@ bool app_peripherals_self_test(struct app_test_data_t * test_data)
 {
   bool rslt = true;
 
-
-
-
-  /******************************** Testing Antenna Device - START ****************************/
-  // Try to Init Antenna Assembly
-  if(app_antenna_init(0b11)){
-    uint16_t temperature = 0;
-    uint32_t frequency = 0;
-    uint8_t error_mask = 0; // Currently unused with testing
-
-    // Get temperature from antenna sensor
-    app_antenna_get_temperature(&temperature);
-    test_data->temp = (int16_t)temperature;
-
-    // TODO Check if this is really the problem. Needed, otherwise the values are all 0.
-    nrf_delay_ms(185);
-
-    // Get resonant frequency values from both channels
-    app_antenna_get_frequency(0, &frequency, &error_mask);
-    test_data->channel_0 = frequency;
-
-    app_antenna_get_frequency(1, &frequency, &error_mask);
-    test_data->channel_1 = frequency;
-
-    NRF_LOG_INFO("ANTENNA TEMPERATURE TESTING DATA: %d", test_data->temp);
-    NRF_LOG_INFO("ANTENNA FREQUENCY CHAN. 0 TESTING DATA: %d", test_data->channel_0);
-    NRF_LOG_INFO("ANTENNA FREQUENCY CHAN. 1 TESTING DATA: %d", test_data->channel_1);
-
-    test_data->ldc1614_ok = true;
-    test_data->tsys02d_ok = true;
-    test_data->i2c_ok = true;
-    NRF_LOG_INFO("Antenna Assembly Init Success......... 3/6 Passed!");
-  }
-  else{
-    NRF_LOG_ERROR("Antenna Assembly Init Failed!");
-    test_data->ldc1614_ok = false;
-    test_data->tsys02d_ok = false;
-    test_data->i2c_ok = false;
-    rslt = false;
-  }
-
-  // Uninit Antenna Assembly
-  app_antenna_uninit();
-  /******************************** Testing Antenna Device - END *******************************/
-
   /************************************ Testing NFC pins - START **********************************/
   app_uicr_set_gpio_mode();
   NRF_LOG_INFO("NFC pin register %d", NRF_UICR->NFCPINS);

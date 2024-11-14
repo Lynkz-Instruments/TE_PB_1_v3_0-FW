@@ -66,14 +66,6 @@
         </file>
       </folder>
       <folder Name="app_peripherals">
-        <folder Name="app_antenna">
-          <file file_name="src/app_antenna/app_antenna.c">
-            <configuration Name="Debug" build_exclude_from_build="No" />
-          </file>
-          <file file_name="src/app_antenna/app_antenna.h">
-            <configuration Name="Debug" build_exclude_from_build="No" />
-          </file>
-        </folder>
         <folder Name="app_flash">
           <file file_name="src/app_flash/app_flash.c">
             <configuration Name="Debug" build_exclude_from_build="No" />
@@ -81,10 +73,6 @@
           <file file_name="src/app_flash/app_flash.h">
             <configuration Name="Debug" build_exclude_from_build="No" />
           </file>
-        </folder>
-        <folder Name="app_i2c">
-          <file file_name="src/app_i2c/app_i2c.c" />
-          <file file_name="src/app_i2c/app_i2c.h" />
         </folder>
         <folder Name="app_saadc">
           <file file_name="src/app_saadc/app_saadc.c" />
