@@ -1,0 +1,40 @@
+/**
+ * @file app_uart.h
+ * @author Alexandre Desgagné (alexd@lynkz.ca)
+ * @brief 
+ * @version 0.1
+ * @date 2023-01-16
+ * 
+ * @copyright Copyright (c) 2023
+ * 
+ */
+
+#ifndef APP_UART_H
+#define APP_UART_H
+
+#include <stdint.h>
+#include "sdk_errors.h"
+#include "nrf_serial.h"
+
+ret_code_t app_uart_init_lora();
+ret_code_t app_uart_uninit();
+
+ret_code_t app_uart_flush(const uint32_t timeout_ms);
+ret_code_t app_uart_rx_drain(void);
+
+ret_code_t app_uart_write(void const * p_data, const uint32_t size, const uint32_t timeout_ms);
+ret_code_t app_uart_read(void * p_data, uint32_t* size, const uint32_t timeout_ms);
+
+void app_uart_set_rx_callback(void(*rx_handler)(const char c));
+
+bool app_uart_get_and_clear_rx_flag(void);
+bool app_uart_get_and_clear_drv_error_flag(void);
+bool app_uart_get_drv_error_flag(void);
+
+nrf_serial_t const * app_uart_get_instance(void);
+nrf_serial_config_t   const * app_uart_get_serial_config();
+nrf_drv_uart_config_t const * app_uart_get_drv_config();
+
+
+
+#endif // APP_UART_H
