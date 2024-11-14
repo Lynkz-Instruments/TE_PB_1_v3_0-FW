@@ -112,7 +112,6 @@
           <file file_name="Lynkz_Library/peripherals/scheduler/scheduler.h" />
         </folder>
       </folder>
-      <folder Name="tools" />
       <folder Name="utils">
         <configuration Name="Debug" build_exclude_from_build="No" />
         <file file_name="Lynkz_Library/utils/lynkz_crypto.c">
