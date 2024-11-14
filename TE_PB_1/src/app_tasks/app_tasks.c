@@ -79,22 +79,6 @@ static void task_perform_fft(void)
   app_flash_enable(); // Enabling NOR flash and littlefs.
   // Remove fft_data file.
   app_flash_remove_fft_data();
-  // Perform fft.
-  app_vibration_fft(mean_fft_buffer, FFT_SIZE / 2);
-
-  // Store the FFT in fft folder.
-  // This also get the current fft id.
-  uint16_t fft_id = 0;
-  struct app_fft_header_t header = { // Header of the FFT.
-    .fft_id = 0,
-    .gain = fft_gain,
-    .freq = fft_freq
-  };
-
-  if(!app_flash_create_fft_session(&fft_id, header)){ // Create a new session of fft.
-    NRF_LOG_ERROR("Error creating fft session.");
-  }
-  NRF_LOG_INFO("FFT id: %d", fft_id);
   
   // Write the 4096 bytes FFT result in the file.
   uint8_t buffer[FFT_FLASH_WRITE_SIZE] = {0};
@@ -115,13 +99,6 @@ static void task_perform_fft(void)
 static void task_vibration_analysis(void)
 {
   NRF_LOG_INFO("### VIBRATION ANALYSIS TASK ###");
-  // Getting accel vibration RMS.
-  uint16_t accel_mod = app_vibration_analyze();
-  NRF_LOG_INFO("Accel module RMS: %d", accel_mod);
-
-  // Storing vibration data in file.
-  app_flash_enable();
-  app_flash_append_vibration_data(accel_mod);
 
   // If vibration data filled with 10 measures, send the data by LoRa.
   uint32_t file_size = app_flash_get_vibration_data_size();

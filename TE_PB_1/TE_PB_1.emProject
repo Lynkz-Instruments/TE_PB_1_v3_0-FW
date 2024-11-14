@@ -86,14 +86,6 @@
           <file file_name="src/app_i2c/app_i2c.c" />
           <file file_name="src/app_i2c/app_i2c.h" />
         </folder>
-        <folder Name="app_imu">
-          <file file_name="src/app_imu/app_imu.c">
-            <configuration Name="Debug" build_exclude_from_build="No" />
-          </file>
-          <file file_name="src/app_imu/app_imu.h">
-            <configuration Name="Debug" build_exclude_from_build="No" />
-          </file>
-        </folder>
         <folder Name="app_saadc">
           <file file_name="src/app_saadc/app_saadc.c" />
           <file file_name="src/app_saadc/app_saadc.h" />
@@ -125,8 +117,6 @@
         <file file_name="src/app_tasks/app_tasks.h">
           <configuration Name="Debug" build_exclude_from_build="No" />
         </file>
-        <file file_name="src/app_tasks/app_vibration_analysis.c" />
-        <file file_name="src/app_tasks/app_vibration_analysis.h" />
       </folder>
       <file file_name="inc/app.h" />
       <file file_name="inc/custom_board.h" />

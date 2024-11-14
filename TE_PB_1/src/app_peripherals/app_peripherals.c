@@ -24,54 +24,8 @@ bool app_peripherals_self_test(struct app_test_data_t * test_data)
 {
   bool rslt = true;
 
-  /******************************** Testing Flash Device - START ******************************/
-  // Try to init Flash Device
-  // Test MX25R
-  if (app_flash_enable()){
-    if (app_flash_test()){
-      NRF_LOG_INFO("MX25R Init and R/W Success!... 1/6 Test Passed");
-      test_data->flash_ok = true;
-      test_data->spi_ok = true;
-    }
-    else{
-      NRF_LOG_ERROR("MX25R Init and R/W Failed");
-      test_data->flash_ok = false;
-      test_data->spi_ok = false;
-      rslt = false;
-    }
-  }
-  app_flash_disable();
-  /******************************** Testing Flash Device - END ********************************/
 
-  /******************************** Testing IMU Device - START ********************************/
-  // Try to Init IMU Device
-  if(app_imu_init(false)){
-    struct accelerometer_sensor_data_t accel_data;
-    struct gyroscope_sensor_data_t gyro_data;
 
-    app_imu_get_accel_gyro_rms(&accel_data, &gyro_data);
-    test_data->accel_x = accel_data.x;
-    test_data->accel_y = accel_data.y;
-    test_data->accel_z = accel_data.z;
-    test_data->gyro_x = gyro_data.x;
-    test_data->gyro_y = gyro_data.y;
-    test_data->gyro_z = gyro_data.z;
-
-    NRF_LOG_INFO("IMU ACCEL MODULE TESTING DATA: %d", app_imu_get_accel_module_rms());
-    NRF_LOG_INFO("IMU GYRO MODULE TESTING DATA: %d", app_imu_get_gyro_module_rms());
-
-    test_data->bmi_ok = true;
-    test_data->spi_ok = true;
-    NRF_LOG_INFO("IMU Init Success................ 2/6 Passed!");
-  }
-  else{
-    NRF_LOG_ERROR("IMU Init Failed!");
-    rslt = false;
-  }
-
-  // Uninit IMU Device
-  app_imu_uninit();
-  /******************************** Testing IMU Device - END **********************************/
 
   /******************************** Testing Antenna Device - START ****************************/
   // Try to Init Antenna Assembly
@@ -308,18 +262,11 @@ void app_peripherals_send_test_results(struct app_test_data_t * test_data)
 void app_peripherals_get_data(struct app_packet_t * data, uint16_t record_id, uint16_t record_time_sec)
 {
   // IMPORTANT: Flash must be enable before using this function.
-  bool antenna_ready = false;
-  bool imu_ready = false;
 
   if (data != NULL){
     // Get bitmask of enabled channels, and activate only the needed ones
     uint8_t bitmask = app_settings_get_ch_enabled_bitmask();
-    if (app_antenna_init(bitmask)){
-      antenna_ready = true;
-    }
-    if (app_imu_init(false)){
-      imu_ready = true;
-    }
+
     struct app_packet_t sens_data = {0};
     sens_data.record_id = record_id;
 
@@ -345,45 +292,10 @@ void app_peripherals_get_data(struct app_packet_t * data, uint16_t record_id, ui
     for(uint32_t i=0; i < count; i++){
         
       NRF_LOG_INFO("Record %d", i);
-      
-      if (antenna_ready){
-        uint32_t channel_0 = 0; 
-        uint32_t channel_1 = 0; 
-        // Get resonant frequency values from both channels
-        if (bitmask & 0b01) {
-          app_antenna_get_frequency(0, &channel_0, &freq_0_error_mask); 
-          freq_0_total += channel_0; 
-          sens_data.freq_chan_0 = channel_0;
-        }
-
-        if (bitmask & 0b10) {
-          app_antenna_get_frequency(1, &channel_1, &freq_1_error_mask); 
-          freq_1_total += channel_1; 
-          sens_data.freq_chan_1 = channel_1;
-        }
-
-        // Get temperature from antenna sensor
-        app_antenna_get_temperature(&temperature);
-        temp_total += temperature;
-        sens_data.temp = temperature;
-      } else {
-        freq_0_error_mask = freq_0_error_mask | (0b01000000);
-        freq_1_error_mask = freq_1_error_mask | (0b01000000);
-      }
 
       sens_data.err_chan_0 = freq_0_error_mask;
       sens_data.err_chan_1 = freq_1_error_mask;
       
-      if (imu_ready){
-        // Get accel / gyro data
-        struct accelerometer_sensor_data_t accel_data = {0};
-        struct gyroscope_sensor_data_t gyro_data = {0};
-        app_imu_get_accel_gyro_rms(&accel_data, &gyro_data);
-        sens_data.accel_mod = sqrt(accel_data.x * accel_data.x + accel_data.y * accel_data.y + accel_data.z * accel_data.z);
-        sens_data.gyro_mod = sqrt(gyro_data.x * gyro_data.x + gyro_data.y * gyro_data.y + gyro_data.z * gyro_data.z);
-        accel_mod_total += sens_data.accel_mod;
-        gyro_mod_total += sens_data.gyro_mod;
-      }
 
       // Save this packet in flash
       if (!app_flash_record_data_packet((uint8_t *)&sens_data, sizeof(sens_data))){
@@ -415,11 +327,7 @@ void app_peripherals_get_data(struct app_packet_t * data, uint16_t record_id, ui
     NRF_LOG_INFO("Channel 0 Error bitmask: %02x", freq_0_error_mask);
     NRF_LOG_INFO("Channel 1 Error bitmask: %02x", freq_1_error_mask);
 
-    // Uninit Antenna and IMU
-    nrf_delay_ms(500);
-    app_antenna_uninit();
-    nrf_delay_ms(500);
-    app_imu_uninit();
+
   }
 }
 
