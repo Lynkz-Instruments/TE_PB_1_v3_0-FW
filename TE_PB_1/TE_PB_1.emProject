@@ -102,12 +102,6 @@
             <configuration Name="Debug" build_exclude_from_build="No" />
           </file>
         </folder>
-        <folder Name="app_nfc">
-          <file file_name="src/app_nfc/app_nfc.c" />
-          <file file_name="src/app_nfc/app_nfc.h" />
-          <file file_name="src/app_nfc/app_nfc_wakeup.c" />
-          <file file_name="src/app_nfc/app_nfc_wakeup.h" />
-        </folder>
         <folder Name="app_saadc">
           <file file_name="src/app_saadc/app_saadc.c" />
           <file file_name="src/app_saadc/app_saadc.h" />
@@ -267,7 +261,6 @@
         <file file_name="$(SDK_ROOT)/integration/nrfx/legacy/nrf_drv_twi.c" />
         <file file_name="$(SDK_ROOT)/integration/nrfx/legacy/nrf_drv_uart.c" />
         <file file_name="$(SDK_ROOT)/modules/nrfx/drivers/src/nrfx_clock.c" />
-		<file file_name="$(SDK_ROOT)/modules/nrfx/drivers/src/nrfx_saadc.c" />
         <file file_name="$(SDK_ROOT)/modules/nrfx/drivers/src/nrfx_gpiote.c" />
         <file file_name="$(SDK_ROOT)/modules/nrfx/drivers/src/nrfx_nfct.c" />
         <file file_name="$(SDK_ROOT)/modules/nrfx/drivers/src/prs/nrfx_prs.c">
@@ -275,6 +268,7 @@
         </file>
         <file file_name="$(SDK_ROOT)/modules/nrfx/drivers/src/nrfx_rng.c" />
         <file file_name="$(SDK_ROOT)/modules/nrfx/drivers/src/nrfx_rtc.c" />
+        <file file_name="$(SDK_ROOT)/modules/nrfx/drivers/src/nrfx_saadc.c" />
         <file file_name="$(SDK_ROOT)/modules/nrfx/drivers/src/nrfx_spi.c" />
         <file file_name="$(SDK_ROOT)/modules/nrfx/drivers/src/nrfx_spim.c" />
         <file file_name="$(SDK_ROOT)/modules/nrfx/drivers/src/nrfx_timer.c" />

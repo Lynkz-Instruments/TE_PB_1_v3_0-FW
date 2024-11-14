@@ -69,27 +69,6 @@ bool app_hdw_init(void)
   // Configure test board detection pin.
   nrf_gpio_cfg_input(TB_DETECT_PIN, NRF_GPIO_PIN_PULLDOWN);
   
-  // Check if the device is on test board.
-  NRF_LOG_INFO("TestBoard detected: %d", (uint8_t)app_hdw_is_on_test_board());
-
-  // NFC
-  if (!app_hdw_is_on_test_board()){ // Skip this part if the device is on test board or if NFC is disabled.
-    app_uicr_set_nfc_mode();
-    NRF_LOG_INFO("NFC pin register %d", NRF_UICR->NFCPINS);
-    uint32_t uicr_nfc = app_uicr_get(APP_NFC_WAKEUP_UICR_OFFSET);
-    NRF_LOG_INFO("NFC UICR value: %d", uicr_nfc);
-    if (uicr_nfc == 0 || uicr_nfc != 1){ // If the device is powered off or the uicr is invalid, init nfc anyway.
-      NRF_LOG_INFO("Init NFC.");
-      APP_ERROR_CHECK(app_nfc_wakeup_init(device_deep_sleep));
-      SCH_Dispatch_Tasks(); // IMPORTANT: Handle task requested by NFC.
-    }
-    else{
-      // Disconnect both NFC pins.
-      NRF_LOG_INFO("Disconnect NFC pins.");
-      nrf_gpio_cfg(NFC1_PIN, NRF_GPIO_PIN_DIR_INPUT, NRF_GPIO_PIN_INPUT_DISCONNECT, NRF_GPIO_PIN_NOPULL, NRF_GPIO_PIN_S0S1, NRF_GPIO_PIN_NOSENSE);
-      nrf_gpio_cfg(NFC2_PIN, NRF_GPIO_PIN_DIR_INPUT, NRF_GPIO_PIN_INPUT_DISCONNECT, NRF_GPIO_PIN_NOPULL, NRF_GPIO_PIN_S0S1, NRF_GPIO_PIN_NOSENSE);
-    }
-  }
 
   // Get the reset reason
   NRF5_UTILS_GetResetReasons();
