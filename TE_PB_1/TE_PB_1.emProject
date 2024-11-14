@@ -112,15 +112,7 @@
           <file file_name="Lynkz_Library/peripherals/scheduler/scheduler.h" />
         </folder>
       </folder>
-      <folder Name="tools">
-        <folder Name="littlefs">
-          <configuration Name="Debug" build_exclude_from_build="No" />
-          <file file_name="Lynkz_Library/tools/littlefs/lfs.c" />
-          <file file_name="Lynkz_Library/tools/littlefs/lfs.h" />
-          <file file_name="Lynkz_Library/tools/littlefs/lfs_util.c" />
-          <file file_name="Lynkz_Library/tools/littlefs/lfs_util.h" />
-        </folder>
-      </folder>
+      <folder Name="tools" />
       <folder Name="utils">
         <configuration Name="Debug" build_exclude_from_build="No" />
         <file file_name="Lynkz_Library/utils/lynkz_crypto.c">
