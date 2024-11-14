@@ -13,7 +13,6 @@
 #define APP_SETTINGS_H
 
 #include "app.h"
-#include "app_imu.h"
 
 // Default config SmartLiner
 // Set default configuration here

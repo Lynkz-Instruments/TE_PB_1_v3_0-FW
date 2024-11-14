@@ -30,8 +30,6 @@
 #include "lynkz_utils.h"
 #include "scheduler.h"
 
-#include "app_nfc.h"
-#include "app_nfc_wakeup.h"
 
 #define WAKE_UP_TIME_SEC 0.1 // Wake up time in seconds
 

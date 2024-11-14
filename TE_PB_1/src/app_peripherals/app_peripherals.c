@@ -9,7 +9,6 @@
 */
 
 #include "app_peripherals.h"
-#include "app_flash.h"
 #include "app_settings.h"
 #include "app_hardware.h"
 #include "lynkz_utils.h"

@@ -15,13 +15,7 @@
 
 #include "app_ble.h"
 #include "app_tasks.h"
-#include "app_flash.h"
-#include "app_imu.h"
-#include "app_antenna.h"
-#include "app_lora.h"
 
-#include "mx25r.h"
-#include "bmi270_nrf5.h"
 #include "ble_nrf.h"
 #include "app.h"
 

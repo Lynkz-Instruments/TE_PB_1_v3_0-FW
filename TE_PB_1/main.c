@@ -16,8 +16,6 @@
 #include "app_peripherals.h"
 #include "app_settings.h"
 #include "app_tasks.h"
-#include "app_flash.h"
-#include "app_lora.h"
 
 // 0 -> No log
 // 1 -> Error only

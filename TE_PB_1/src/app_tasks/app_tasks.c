@@ -11,11 +11,8 @@
 
 #include "app_tasks.h"
 
-#include "app_lora.h"
 #include "app_settings.h"
 #include "app_communication.h"
-#include "app_vibration_analysis.h"
-#include "app_nfc.h"
 #include "app_saadc.h"
 #include "app.h"
 
@@ -131,9 +128,6 @@ static void task_power_off_device(void)
     APP_ERROR_CHECK(nrf_sdh_disable_request());
     need_reset = true;
   }
-  
-  // Write the device state in UICR.
-  app_uicr_set(APP_NFC_WAKEUP_UICR_OFFSET, 0);
   
   NRF_LOG_INFO("The device will reset.");
   nrf_delay_ms(100);

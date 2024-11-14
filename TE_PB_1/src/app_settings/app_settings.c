@@ -64,15 +64,6 @@ bool app_settings_set_configuration(uint8_t * data)
     if (config->fft_period_hours == 0xFF){
       config->fft_period_hours = FFT_PERIOD_HOURS_DEFAULT;
     }
-    if (config->accelerometer_range == 0xFF || config->accelerometer_range == 0x00 || config->accelerometer_range > APP_IMU_ACC_16G || config->accelerometer_range < APP_IMU_ACC_2G){
-      config->accelerometer_range = ACCELEROMETER_RANGE_DEFAULT;
-    }
-    if (config->gyroscope_range == 0xFF || config->gyroscope_range == 0x00 || config->gyroscope_range > APP_IMU_GYRO_2000DPS || config->gyroscope_range < APP_IMU_GYRO_125DPS){
-      config->gyroscope_range = GYROSCOPE_RANGE_DEFAULT;
-    }
-    if (config->imu_frequency == 0xFF || config->imu_frequency == 0x00 || config->imu_frequency > APP_IMU_FREQ_1600HZ || config->imu_frequency < APP_IMU_FREQ_25HZ){
-      config->imu_frequency = IMU_FREQUENCY_DEFAULT;
-    }
     if (config->ch0_drive_current == 0xFF || config->ch0_drive_current == 0x00 || config->ch0_drive_current > 0b11111) {
       config->ch0_drive_current = CH0_DRIVE_CURRENT_DEFAULT;
     }

@@ -18,7 +18,6 @@
 #include "ble_nrf.h"
 #include "app_settings.h"
 #include "app_ble.h"
-#include "app_flash.h"
 #include "app.h"
 #include "lynkz_utils.h"
 #include "nrf5_utils.h"
