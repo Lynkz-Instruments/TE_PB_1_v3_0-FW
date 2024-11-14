@@ -34,22 +34,12 @@
 static uint16_t session_to_download = 0;
 static bool is_advertising = false;
 
-static void data_gathering(uint16_t record_duration);
-static void task_perform_fft(void);
-static void task_vibration_analysis(void);
 static void task_advertise(void);
 static void task_flash_led(void);
 static void task_stop_advertising(void);
 static void task_send_heart_beat(void);
 static void task_send_data(void);
 static void task_save_config(void);
-static void task_download_data_ble(void);
-static void task_download_fft_ble(void);
-static void task_get_session_count(void);
-static void task_get_fft_count(void);
-static void task_erase_all(void);
-static void task_erase_data(void);
-static void task_erase_fft(void);
 static void task_power_off_device(void);
 static void task_data_request(void);
 
@@ -71,22 +61,9 @@ static void task_send_heart_beat(void)
   app_hdw_gpio_low_power(); // Sleep
 }
 
-static void task_perform_fft(void)
-{
-}
-
-static void task_vibration_analysis(void)
-{
-}
-
-static void data_gathering(uint16_t record_duration)
-{
-}
-
 static void task_send_data(void)
 {    
-  NRF_LOG_INFO("### DATA GATHERING TASK ###");
-  data_gathering(app_settings_get_record_duration_seconds());    
+  NRF_LOG_INFO("### DATA GATHERING TASK ###"); 
 }
 
 static void task_save_config(void)
@@ -111,34 +88,6 @@ static void task_save_config(void)
   SCH_Modify_Task(task_send_data, SEC_TO_TICK(app_settings_get_record_period_minutes() * 60), SEC_TO_TICK(app_settings_get_record_period_minutes() * 60), false); // Reset the data record task.
 
   app_hdw_wdt_kick();
-}
-
-static void task_download_data_ble(void)
-{
-}
-
-static void task_download_fft_ble(void)
-{
-}
-
-static void task_get_session_count(void)
-{
-}
-
-static void task_get_fft_count(void)
-{
-}
-
-static void task_erase_all(void)
-{
-}
-
-static void task_erase_data(void)
-{
-}
-
-static void task_erase_fft(void)
-{
 }
 
 static void task_flash_led(void)
@@ -198,7 +147,6 @@ static void task_power_off_device(void)
 static void task_data_request(void)
 {
   NRF_LOG_INFO("### DATA REQUEST TASK ###");
-  data_gathering(app_settings_get_record_duration_seconds()); 
   app_comm_send_response();
 }
 
@@ -218,62 +166,11 @@ void setup_tasks(void)
   // Get Data and Send it through LoRaWAN
   SCH_Add_Task(task_send_data, 0, SEC_TO_TICK(app_settings_get_record_period_minutes() * 60), false);
 
-  // Getting and sending vibration data over LoRa
-  if (TASK_VIBRATION_ANALYSIS_PERIOD != 0){
-    SCH_Add_Task(task_vibration_analysis, SEC_TO_TICK(TASK_VIBRATION_ANALYSIS_PERIOD), SEC_TO_TICK(TASK_VIBRATION_ANALYSIS_PERIOD), false);
-  }
-
-  // Perform FFTs
-  // If this config is set at 0, don't start automatically the task.
-  // A request can be manualy done to perform an FFT.
-  if (app_settings_get_fft_period_hours() != 0){
-    SCH_Add_Task(task_perform_fft, SEC_TO_TICK(app_settings_get_fft_period_hours() * 3600), SEC_TO_TICK(app_settings_get_fft_period_hours() * 3600), false);
-  }
 }
 
 void app_tasks_save_config(void)
 {
   SCH_Add_Task(task_save_config, 0, 0, true);
-}
-
-void app_tasks_data_ble_download(void)
-{
-  SCH_Add_Task(task_download_data_ble, 0, 0, true);
-}
-
-void app_tasks_fft_ble_download(void)
-{
-  SCH_Add_Task(task_download_fft_ble, 0, 0, true);
-}
-
-void app_tasks_perform_fft(void)
-{
-  SCH_Add_Task(task_perform_fft, 0, 0, true);
-}
-
-void app_tasks_erase_data(void)
-{
-  SCH_Add_Task(task_erase_data, 0, 0, true);
-}
-
-void app_tasks_erase_fft(void)
-{
-  SCH_Add_Task(task_erase_fft, 0, 0, true);
-}
-
-void app_tasks_get_session_count(void)
-{
-  SCH_Add_Task(task_get_session_count, 0, 0, true);
-}
-
-void app_tasks_get_fft_count(void)
-{
-  SCH_Add_Task(task_get_fft_count, 0, 0, true);
-}
-
-void app_tasks_erase_all(void)
-{
-  SCH_Add_Task(task_erase_all, 0, 0, true);
 }
 
 void app_tasks_record_set_download_id(uint16_t session_id)

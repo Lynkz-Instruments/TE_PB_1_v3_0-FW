@@ -184,7 +184,6 @@ static void app_comm_download_data(void)
   #endif
 
   app_comm_send_ack();
-  app_tasks_data_ble_download();
 }
 
 static void app_comm_download_fft(void)
@@ -194,7 +193,6 @@ static void app_comm_download_fft(void)
   #endif
 
   app_comm_send_ack();
-  app_tasks_fft_ble_download();
 }
 
 static void app_comm_get_session_count(void)
@@ -204,7 +202,6 @@ static void app_comm_get_session_count(void)
   #endif
   
   app_comm_send_ack();
-  app_tasks_get_session_count();
 }
 
 static void app_comm_get_fft_count(void)
@@ -214,7 +211,6 @@ static void app_comm_get_fft_count(void)
   #endif
   
   app_comm_send_ack();
-  app_tasks_get_fft_count();
 }
 
 static void app_comm_get_device_info(void)
@@ -261,7 +257,6 @@ static void app_comm_erase_all(void)
   #endif
 
   app_comm_send_ack();
-  app_tasks_erase_all();
 }
 
 static void app_comm_erase_data(void)
@@ -271,7 +266,6 @@ static void app_comm_erase_data(void)
   #endif
 
   app_comm_send_ack();
-  app_tasks_erase_data();
 }
 
 static void app_comm_erase_fft(void)
@@ -281,7 +275,6 @@ static void app_comm_erase_fft(void)
   #endif
 
   app_comm_send_ack();
-  app_tasks_erase_fft();
 }
 
 static void app_comm_get_config(void)
@@ -348,8 +341,6 @@ static void app_comm_perform_fft(void)
   #endif
 
   app_comm_send_ack();
-  
-  app_tasks_perform_fft();
 }
 
 static void app_comm_restart_device(void)
