@@ -69,6 +69,9 @@ static void gpio_init(void);
 
 void buttons_interrupt_init(void);
 
+void UART_button_interrupt_init(void);
+
+void mode_button_interrupt_init(void);
 
 bool app_hdw_init(void)
 {
@@ -196,8 +199,8 @@ static void gpio_init(void)
   
   NRF_LOG_INFO("BUTTON_PINS");
   // Buttons (À VÉRIFIER)
-  nrf_gpio_cfg(UART_SELECTOR_BTN, NRF_GPIO_PIN_DIR_INPUT, NRF_GPIO_PIN_INPUT_DISCONNECT, NRF_GPIO_PIN_NOPULL, NRF_GPIO_PIN_S0D1, NRF_GPIO_PIN_NOSENSE);
-  nrf_gpio_cfg(MODE_SELECTOR_BTN, NRF_GPIO_PIN_DIR_INPUT, NRF_GPIO_PIN_INPUT_DISCONNECT, NRF_GPIO_PIN_NOPULL, NRF_GPIO_PIN_S0D1, NRF_GPIO_PIN_NOSENSE);
+  //nrf_gpio_cfg(UART_SELECTOR_BTN, NRF_GPIO_PIN_DIR_INPUT, NRF_GPIO_PIN_INPUT_DISCONNECT, NRF_GPIO_PIN_NOPULL, NRF_GPIO_PIN_S0D1, NRF_GPIO_PIN_NOSENSE);
+  //nrf_gpio_cfg(MODE_SELECTOR_BTN, NRF_GPIO_PIN_DIR_INPUT, NRF_GPIO_PIN_INPUT_DISCONNECT, NRF_GPIO_PIN_NOPULL, NRF_GPIO_PIN_S0D1, NRF_GPIO_PIN_NOSENSE);
 
   NRF_LOG_INFO("POWER_SENS");
   // Power SENS (À VÉRIFIER)
@@ -280,7 +283,7 @@ void app_hdw_select_mode()
     break;
   }
   
-  NRF_LOG_INFO(mode);
+  NRF_LOG_INFO("%d", mode);
 
 }
 
@@ -305,7 +308,7 @@ void app_hdw_select_UART()
   default:
       break;
   }
-  NRF_LOG_INFO(uart_conf);
+  NRF_LOG_INFO("%d", uart_conf);
 
 
 }
@@ -466,19 +469,36 @@ void app_hdw_detect_TAG()
 void buttons_interrupt_init(void)
 {
     if(!interrupt_initialized){
-      // GPIO configuration for the INT1 pin.
-      ret_code_t err_code;
-      err_code = nrf_drv_gpiote_init();
-      APP_ERROR_CHECK(err_code);
-
-      nrf_drv_gpiote_in_config_t in_config = GPIOTE_CONFIG_IN_SENSE_HITOLO(false);
-      in_config.pull = NRF_GPIO_PIN_NOPULL;
-
-      err_code = nrf_drv_gpiote_in_init(UART_SELECTOR_BTN, &in_config, app_hdw_read_UART_BTN);
-      APP_ERROR_CHECK(err_code);
-
-      err_code = nrf_drv_gpiote_in_init(MODE_SELECTOR_BTN, &in_config, app_hdw_read_mode_BTN);
-      APP_ERROR_CHECK(err_code);
+      UART_button_interrupt_init();
+      mode_button_interrupt_init();
       interrupt_initialized = true;
+      
+      NRF_LOG_INFO("INTERRUPT_INIT");
+
     }
+    nrf_drv_gpiote_in_event_enable(UART_SELECTOR_BTN, true);
+    nrf_drv_gpiote_in_event_enable(MODE_SELECTOR_BTN, true);
+
+}
+
+void UART_button_interrupt_init(void) {
+    // GPIO configuration for the INT1 pin.
+    ret_code_t err_code;
+    err_code = nrf_drv_gpiote_init();
+    APP_ERROR_CHECK(err_code);
+
+
+    nrf_drv_gpiote_in_config_t in_config = GPIOTE_CONFIG_IN_SENSE_HITOLO(false);
+    in_config.pull = NRF_GPIO_PIN_PULLUP;
+
+    err_code = nrf_drv_gpiote_in_init(UART_SELECTOR_BTN, &in_config, app_hdw_read_UART_BTN);
+    APP_ERROR_CHECK(err_code);
+}
+
+void mode_button_interrupt_init(void) {
+
+    nrf_drv_gpiote_in_config_t in_config = GPIOTE_CONFIG_IN_SENSE_HITOLO(false);
+    in_config.pull = NRF_GPIO_PIN_PULLUP;
+
+    nrf_drv_gpiote_in_init(MODE_SELECTOR_BTN, &in_config, app_hdw_read_mode_BTN);
 }
