@@ -55,7 +55,6 @@ static void task_send_heart_beat(void)
   NRF_LOG_INFO("### SENDING HEART BEAT ###");
 
   app_hdw_wdt_kick();
-  app_hdw_gpio_low_power(); // Sleep
 }
 
 static void task_send_data(void)
@@ -89,12 +88,6 @@ static void task_save_config(void)
 
 static void task_flash_led(void)
 {
-  // Light the green LED for 25ms then close.
-  nrf_gpio_pin_clear(GREEN_LED);
-  app_hdw_set_green_led(true);
-  nrf_delay_ms(25);
-  app_hdw_set_green_led(false);
-  app_hdw_wdt_kick();
 }
 
 static void task_advertise(void)

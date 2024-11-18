@@ -1,10 +1,10 @@
 /**
-* @author Xavier Bernard (xavier@lynkz.ca)
+* @author Lucas Bonenfant (lucas@lynkz.ca)
 * @brief 
 * @version 1.0
-* @date 2023-04-15
+* @date 2024-11-13
 * 
-* @copyright Copyright (c) 2023
+* @copyright Copyright (c) Lynkz Instruments Inc, Amos 2024
 * 
 */
 #ifndef BOARD_CUSTOM_H
@@ -14,49 +14,44 @@ extern "C" {
 #endif
 
 //LEDS Default Pin Definition
-#define LEDS_NUMBER 1
-
-#define BLUE_LED 25 // Blue Status LED
-#define GREEN_LED 26 // Green Status LED
-#define RED_LED 27 // Red Status LED
+#define INT_STCO_LED 29 // Internal STARTCO LED
+#define INT_BV_LED 30 // Internal Bavard LED
+#define MUX1_UART_LED 31 // 1st UART selector LED
+#define MUX2_UART_LED 10 // 2st UART selector LED
+#define LOW_BAT_LED 15 // 2st UART selector LED
 
 //UART Default Pin Definition
-#define UART_RX_PIN_NUMBER 14
-#define UART_TX_PIN_NUMBER 15
-#define TB_RX_PIN_NUMBER 18
-#define TB_TX_PIN_NUMBER 16
+#define UART_RX_PIN_NUMBER 5 // ProgBoard's ANNA UART Rx
+#define UART_TX_PIN_NUMBER 4 // ProgBoard's ANNA UART Tx
+#define TAG_RX_PIN_NUMBER 18 // TAG's ANNA UART Rx
+#define TAG_TX_PIN_NUMBER 16 // TAG's ANNA UART Tx
+#define BV_TX_PIN_NUMBER 14 // Bavard's UART Tx
 #define SERIAL_RTS_PIN 0xFF
-#define SERIAL_CTS_PIN 0xFF
+#define SERIAL_CTS_PIN 0xFF.
 
-//SPI Default Pin Definition
-#define SPIM1_SCK_PIN         11  // SPI clock GPIO pin number.
-#define SPIM1_MOSI_PIN        4   // SPI Master Out Slave In GPIO pin number.
-#define SPIM1_MISO_PIN        5   // SPI Master In Slave Out GPIO pin number.
-#define SPIM1_CSB_FLASH_PIN   3   // Flash SPI Slave Select GPIO pin number.
-#define SPIM1_CSB_IMU_PIN     19  // IMU SPI Slave Select GPIO pin number.
+//Analog Switch Default Pin Definition
+#define SW1 23 // Analog switch to connect the red terminal to the TAG's STCO input
+#define SW2 22 // Analog switch to connect the red terminal to the Internal Bavard
+#define SW3 26 // Analog switch to connect the Internal STCO to the Internal Bavard
+#define SW4_5 25 // Analog switch to connect the black terminal to GND or the Internal STCO
+#define SW6 27 // Analog switch to connect Bavard's filter circuit when the Internal Bavard is used
 
-//I2C Default Pin Definition
-#define I2CM0_SDA_PIN   20   // I2C SDA Pin Number.
-#define I2CM0_SCL_PIN   24   // I2C SCL Pin Number.
+//STARTCO Default Pin Definition
+#define STCO_OK 9 // HIGH if GND Check is passed
+#define STCO_OPEN_Z 20 // HIGH if GND Check says OPEN CIRCUIT
+#define STCO_SHORT_Z 24 // HIGH if GND Check says SHORT CIRCUIT
 
-//Interrupt Pin Definition
-#define IMU_INT_PIN 29
+//Buttons Default Pin Definition
+#define UART_SELECTOR_BTN 19 // Selector to chose which device communicate with UART through USB
+#define MODE_SELECTOR_BTN 11 // Selector to change the configuration (INTERNAL/EXTERNAL STCO/Bavard)
 
-// Peripheral PWR GPIO
-#define PWR_FLASH_BMI_PIN 2
-// #define PWR_IMU_PIN 31
-#define PWR_LORA_PIN 28
-#define PWR_ANTENNA_PIN 22
+//TAG Power Default Pin Definition
+#define TAG_PWR 28 // Can power the TAG through this pin
+#define TAG_PWR_SENS 2 // Can read if the tag is powered
 
-// Test Board Detect GPIO
-#define TB_DETECT_PIN 30
+//Battery sens Default Pin Definition
+#define V_BAT_SENS 3 // Can read the battery's voltage
 
-// LoRa Reset GPIO
-#define LORA_RST_PIN 23
-
-// NFC
-#define NFC1_PIN 9
-#define NFC2_PIN 10
 
 // Low frequency clock source to be used by the SoftDevice
 #define NRF_CLOCK_LFCLKSRC {.source = NRF_CLOCK_LF_SRC_XTAL, \

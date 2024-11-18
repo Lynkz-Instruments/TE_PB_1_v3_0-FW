@@ -47,7 +47,6 @@ void ble_evt_handler(ble_evt_t const * p_ble_evt, void * p_context)
     case BLE_GAP_EVT_CONNECTED:
       NRF_LOG_INFO("Connected");
       ble_user_connected = true;
-      app_hdw_set_blue_led(true);
       m_conn_handle = p_ble_evt->evt.gap_evt.conn_handle;
       err_code = nrf_ble_qwr_conn_handle_assign(p_m_qwr, m_conn_handle);
       APP_ERROR_CHECK(err_code);
@@ -55,7 +54,6 @@ void ble_evt_handler(ble_evt_t const * p_ble_evt, void * p_context)
 
     case BLE_GAP_EVT_DISCONNECTED:
       NRF_LOG_INFO("Disconnected");
-      app_hdw_set_blue_led(false);
       ble_user_connected = false;
       m_conn_handle = BLE_CONN_HANDLE_INVALID;
       advertising_stop();

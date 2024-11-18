@@ -48,23 +48,6 @@ int main(void)
   // Hardware init
   app_hdw_init();
 
-  // Self test if device is on test board.
-  if (app_hdw_is_on_test_board()){
-    nrf_delay_ms(3000);
-
-    struct app_test_data_t test_data = {0};
-    app_peripherals_self_test(&test_data);
-    
-    while(1){
-      app_hdw_set_leds(false, false, false);
-      nrf_delay_ms(2000);
-      app_hdw_set_leds(true, false, false);
-      nrf_delay_ms(25);
-      app_hdw_wdt_kick();
-    }
-  }
-  app_hdw_disconnect_test_board_detect();
-
   // Getting config from NOR flash.
   #if FLASH_RESET > 0
 
