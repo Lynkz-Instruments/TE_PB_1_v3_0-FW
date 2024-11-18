@@ -228,6 +228,10 @@ static void gpio_init(void)
   // UART config
 
 
+  app_hdw_set_INT_STCO_led(false);
+  app_hdw_set_INT_BV_led(false);
+  app_hdw_set_UART1_led(false);
+  app_hdw_set_UART2_led(false);
 }
 
 void app_hdw_select_mode()
@@ -431,6 +435,7 @@ void app_hdw_read_mode_BTN()
     mode = 0;
   }
   app_hdw_select_mode();
+  nrf_delay_ms(300); //Si pas de debounce
 }
 
 void app_hdw_read_UART_BTN()
@@ -440,6 +445,8 @@ void app_hdw_read_UART_BTN()
     uart_conf = 0;
   }
   app_hdw_select_UART();
+  nrf_delay_ms(300); //Si pas de debounce
+
 }
 
 void app_hdw_read_V_BAT()
