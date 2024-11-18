@@ -24,9 +24,7 @@
 uint8_t mode = 0;
 uint8_t uart_conf = 0;
 
-bool mode_BTN_last_state = false;
-bool UART_BTN_last_state = false;
-
+static bool interrupt_initialized = false;
 
 
 bool nfc_minimal_initialization_done = false;
@@ -69,6 +67,9 @@ static void rtc_init(void);
  */
 static void gpio_init(void);
 
+void buttons_interrupt_init(void);
+
+
 bool app_hdw_init(void)
 {
   // Init logging system.
@@ -92,6 +93,7 @@ bool app_hdw_init(void)
   NRF_LOG_INFO("GPIO_INIT_START");
   gpio_init();
   NRF_LOG_INFO("GPIO_INIT_END");
+  buttons_interrupt_init();
 
   return true;
 }
@@ -277,6 +279,8 @@ void app_hdw_select_mode()
   default:
     break;
   }
+  
+  NRF_LOG_INFO(mode);
 
 }
 
@@ -301,6 +305,8 @@ void app_hdw_select_UART()
   default:
       break;
   }
+  NRF_LOG_INFO(uart_conf);
+
 
 }
 
@@ -416,29 +422,21 @@ void app_hdw_set_TAG_pwr(bool on)
 
 void app_hdw_read_mode_BTN()
 {
-  bool state = !(bool)nrf_gpio_pin_read(MODE_SELECTOR_BTN);
-  if (state &&  state != mode_BTN_last_state){
-    mode++;
-    if (mode > NB_MODE)
-    {
-      mode = 0;
-    }
-    app_hdw_select_mode();
+  mode++;
+  if (mode > NB_MODE)
+  {
+    mode = 0;
   }
-  mode_BTN_last_state = state;
+  app_hdw_select_mode();
 }
 
 void app_hdw_read_UART_BTN()
 {
-  bool state = !(bool)nrf_gpio_pin_read(UART_SELECTOR_BTN);
-  if (state &&  state != UART_BTN_last_state){
-    uart_conf++;
-    if (uart_conf > NB_UART_CONF){
-      uart_conf = 0;
-    }
-    app_hdw_select_UART();
+  uart_conf++;
+  if (uart_conf > NB_UART_CONF){
+    uart_conf = 0;
   }
-  UART_BTN_last_state = state;
+  app_hdw_select_UART();
 }
 
 void app_hdw_read_V_BAT()
@@ -461,4 +459,26 @@ void app_hdw_detect_TAG()
     }
       app_hdw_set_TAG_pwr(false);
   }
+}
+
+
+
+void buttons_interrupt_init(void)
+{
+    if(!interrupt_initialized){
+      // GPIO configuration for the INT1 pin.
+      ret_code_t err_code;
+      err_code = nrf_drv_gpiote_init();
+      APP_ERROR_CHECK(err_code);
+
+      nrf_drv_gpiote_in_config_t in_config = GPIOTE_CONFIG_IN_SENSE_HITOLO(false);
+      in_config.pull = NRF_GPIO_PIN_NOPULL;
+
+      err_code = nrf_drv_gpiote_in_init(UART_SELECTOR_BTN, &in_config, app_hdw_read_UART_BTN);
+      APP_ERROR_CHECK(err_code);
+
+      err_code = nrf_drv_gpiote_in_init(MODE_SELECTOR_BTN, &in_config, app_hdw_read_mode_BTN);
+      APP_ERROR_CHECK(err_code);
+      interrupt_initialized = true;
+    }
 }
