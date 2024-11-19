@@ -69,6 +69,9 @@ static void gpio_init(void);
 
 void buttons_interrupt_init(void);
 
+void UART_button_interrupt_init(void);
+
+void mode_button_interrupt_init(void);
 
 bool app_hdw_init(void)
 {
@@ -196,8 +199,8 @@ static void gpio_init(void)
   
   NRF_LOG_INFO("BUTTON_PINS");
   // Buttons (À VÉRIFIER)
-  nrf_gpio_cfg(UART_SELECTOR_BTN, NRF_GPIO_PIN_DIR_INPUT, NRF_GPIO_PIN_INPUT_DISCONNECT, NRF_GPIO_PIN_NOPULL, NRF_GPIO_PIN_S0D1, NRF_GPIO_PIN_NOSENSE);
-  nrf_gpio_cfg(MODE_SELECTOR_BTN, NRF_GPIO_PIN_DIR_INPUT, NRF_GPIO_PIN_INPUT_DISCONNECT, NRF_GPIO_PIN_NOPULL, NRF_GPIO_PIN_S0D1, NRF_GPIO_PIN_NOSENSE);
+  //nrf_gpio_cfg(UART_SELECTOR_BTN, NRF_GPIO_PIN_DIR_INPUT, NRF_GPIO_PIN_INPUT_DISCONNECT, NRF_GPIO_PIN_NOPULL, NRF_GPIO_PIN_S0D1, NRF_GPIO_PIN_NOSENSE);
+  //nrf_gpio_cfg(MODE_SELECTOR_BTN, NRF_GPIO_PIN_DIR_INPUT, NRF_GPIO_PIN_INPUT_DISCONNECT, NRF_GPIO_PIN_NOPULL, NRF_GPIO_PIN_S0D1, NRF_GPIO_PIN_NOSENSE);
 
   NRF_LOG_INFO("POWER_SENS");
   // Power SENS (À VÉRIFIER)
@@ -225,13 +228,17 @@ static void gpio_init(void)
   // UART config
 
 
+  app_hdw_set_INT_STCO_led(false);
+  app_hdw_set_INT_BV_led(false);
+  app_hdw_set_UART1_led(false);
+  app_hdw_set_UART2_led(false);
 }
 
 void app_hdw_select_mode()
 {
   switch (mode)
   {
-  case 1:
+  case 0:
     app_hdw_set_INT_STCO_led(false);
     app_hdw_set_INT_BV_led(false);
 
@@ -242,7 +249,7 @@ void app_hdw_select_mode()
     app_hdw_set_analog_switch6(false);
     break;
       
-  case 2:
+  case 1:
     app_hdw_set_INT_STCO_led(true);
     app_hdw_set_INT_BV_led(false);
 
@@ -253,7 +260,7 @@ void app_hdw_select_mode()
     app_hdw_set_analog_switch6(false);
     break;
 
-  case 3:
+  case 2:
     app_hdw_set_INT_STCO_led(true);
     app_hdw_set_INT_BV_led(true);
 
@@ -265,7 +272,7 @@ void app_hdw_select_mode()
 
     break;
 
-  case 4:
+  case 3:
     app_hdw_set_INT_STCO_led(false);
     app_hdw_set_INT_BV_led(true);
 
@@ -280,7 +287,7 @@ void app_hdw_select_mode()
     break;
   }
   
-  NRF_LOG_INFO(mode);
+  NRF_LOG_INFO("MODE : %d", mode);
 
 }
 
@@ -288,15 +295,15 @@ void app_hdw_select_UART()
 {
   switch (uart_conf)
   {
-  case 1:
+  case 0:
     app_hdw_set_UART1_led(false);
     app_hdw_set_UART2_led(false);
     break;
-  case 2:
+  case 1:
     app_hdw_set_UART1_led(true);
     app_hdw_set_UART2_led(false);
     break;
-  case 3:
+  case 2:
     app_hdw_set_UART1_led(false);
     app_hdw_set_UART2_led(true);
     break;
@@ -305,7 +312,7 @@ void app_hdw_select_UART()
   default:
       break;
   }
-  NRF_LOG_INFO(uart_conf);
+  NRF_LOG_INFO("UART : %d", uart_conf);
 
 
 }
@@ -423,20 +430,23 @@ void app_hdw_set_TAG_pwr(bool on)
 void app_hdw_read_mode_BTN()
 {
   mode++;
-  if (mode > NB_MODE)
+  if (mode > NB_MODE - 1)
   {
     mode = 0;
   }
   app_hdw_select_mode();
+  nrf_delay_ms(300); //Si pas de debounce
 }
 
 void app_hdw_read_UART_BTN()
 {
   uart_conf++;
-  if (uart_conf > NB_UART_CONF){
+  if (uart_conf > NB_UART_CONF - 1){
     uart_conf = 0;
   }
   app_hdw_select_UART();
+  nrf_delay_ms(300); //Si pas de debounce
+
 }
 
 void app_hdw_read_V_BAT()
@@ -465,20 +475,39 @@ void app_hdw_detect_TAG()
 
 void buttons_interrupt_init(void)
 {
-    if(!interrupt_initialized){
-      // GPIO configuration for the INT1 pin.
-      ret_code_t err_code;
-      err_code = nrf_drv_gpiote_init();
-      APP_ERROR_CHECK(err_code);
+  if(!interrupt_initialized){
 
-      nrf_drv_gpiote_in_config_t in_config = GPIOTE_CONFIG_IN_SENSE_HITOLO(false);
-      in_config.pull = NRF_GPIO_PIN_NOPULL;
+  // GPIO configuration for the INT1 pin.
+  ret_code_t err_code;
+  err_code = nrf_drv_gpiote_init();
+  APP_ERROR_CHECK(err_code);
 
-      err_code = nrf_drv_gpiote_in_init(UART_SELECTOR_BTN, &in_config, app_hdw_read_UART_BTN);
-      APP_ERROR_CHECK(err_code);
 
-      err_code = nrf_drv_gpiote_in_init(MODE_SELECTOR_BTN, &in_config, app_hdw_read_mode_BTN);
-      APP_ERROR_CHECK(err_code);
-      interrupt_initialized = true;
-    }
+    UART_button_interrupt_init();
+    mode_button_interrupt_init();
+    interrupt_initialized = true;
+    
+
+  }
+  nrf_drv_gpiote_in_event_enable(UART_SELECTOR_BTN, true);
+  nrf_drv_gpiote_in_event_enable(MODE_SELECTOR_BTN, true);
+
+  NRF_LOG_INFO("INTERRUPT_INIT");
+}
+
+void UART_button_interrupt_init(void) {
+
+  nrf_drv_gpiote_in_config_t in_config = GPIOTE_CONFIG_IN_SENSE_HITOLO(false);
+  in_config.pull = NRF_GPIO_PIN_PULLUP;
+
+  nrf_drv_gpiote_in_init(UART_SELECTOR_BTN, &in_config, app_hdw_read_UART_BTN);
+
+}
+
+void mode_button_interrupt_init(void) {
+
+  nrf_drv_gpiote_in_config_t in_config = GPIOTE_CONFIG_IN_SENSE_HITOLO(false);
+  in_config.pull = NRF_GPIO_PIN_PULLUP;
+
+  nrf_drv_gpiote_in_init(MODE_SELECTOR_BTN, &in_config, app_hdw_read_mode_BTN);
 }
