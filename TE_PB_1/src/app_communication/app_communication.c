@@ -22,6 +22,7 @@
 #include "lynkz_utils.h"
 #include "nrf5_utils.h"
 #include "app_tasks.h"
+#include "app_uart_module.h"
 
 // 0 -> No log
 // 1 -> Error only
@@ -158,7 +159,10 @@ void app_comm_process(uint8_t const* data, uint16_t len)
         #if APP_COMMUNICATION_VERBOSE >= 1
         NRF_LOG_ERROR("Invalid command.");
         app_comm_send_fail();
-        #endif
+
+        uint8_t data = 0x41; // Exemple: ASCII 'A'
+        uart_send_byte(command);
+       #endif
         break;
     }
   }

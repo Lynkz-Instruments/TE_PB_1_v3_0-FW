@@ -46,4 +46,10 @@ ret_code_t app_uart_module_uninit(void);
  */
 void app_uart_module_set_rx_callback(void(*rx_handler)(const char c));
 
+void uart_configure_pins(uint32_t rx_pin, uint32_t tx_pin);
+
+void uart_transfer(uint32_t src_rx_pin, uint32_t dst_tx_pin);
+
+void uart_send_byte(char byte[]);
+
 #endif // APP_UART_MODULE_H

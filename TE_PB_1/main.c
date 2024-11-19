@@ -16,6 +16,7 @@
 #include "app_peripherals.h"
 #include "app_settings.h"
 #include "app_tasks.h"
+#include "app_uart_module.h"
 
 // 0 -> No log
 // 1 -> Error only
@@ -28,6 +29,15 @@
 
 /**@brief Function for application main entry.
  */
+
+
+// État actif : UART1 ou UART2
+typedef enum {
+    UART1_ACTIVE,
+    UART2_ACTIVE
+} uart_state_t;
+
+static uart_state_t current_uart = UART1_ACTIVE;
 
 int main(void)
 {
@@ -81,6 +91,8 @@ int main(void)
   // Setup Tasks based on memory config
   setup_tasks();
 
+  uart_configure_pins(UART_RX_PIN_NUMBER, UART_TX_PIN_NUMBER);
+
   while(true)
   {
     SCH_Dispatch_Tasks();
@@ -94,4 +106,16 @@ int main(void)
     /* Call SoftDevice Wait For event */
     sd_app_evt_wait();
   }
+
+   while (true) {
+        //if (current_uart == UART1_ACTIVE) {
+        //    // Lire depuis UART1 et envoyer à UART2
+        //    uart_transfer(UART_RX_PIN_NUMBER, TAG_TX_PIN_NUMBER);
+        //    current_uart = UART2_ACTIVE; // Basculer vers UART2
+        //} else {
+        //    // Lire depuis UART2 et envoyer à UART1
+        //    uart_transfer(TAG_RX_PIN_NUMBER, UART_TX_PIN_NUMBER);
+        //    current_uart = UART1_ACTIVE; // Basculer vers UART1
+        //}
+    }
 }
