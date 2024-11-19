@@ -114,7 +114,7 @@ void app_ble_init(void)
   char batch_no_str[9]; // ddccbbaa
   bytesToHexString(batch_no_data, sizeof(batch_no_data), batch_no_str, sizeof(batch_no_str));
 
-  strcat(ble_name, "TE_PB");
+  strcat(ble_name, "TE_PB_");
   strcat(ble_name, batch_no_str);
   strcat(ble_name, "_");
   sprintf(ptr_no, "%03u", panel_no);
