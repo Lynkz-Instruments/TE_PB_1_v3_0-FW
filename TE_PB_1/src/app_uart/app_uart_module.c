@@ -28,22 +28,6 @@ static uint32_t rx_counter = 0;
 static bool tx_ready = false;
 
 
-// Instances UART
-static nrfx_uarte_t uarte = NRFX_UARTE_INSTANCE(0); // Instance UARTE 1
-
-// Buffers
-static uint8_t rx_buffer[UART_RX_BUF_SIZE];
-static uint8_t tx_buffer[UART_RX_BUF_SIZE];
-
-// État actif : UART1 ou UART2
-typedef enum {
-    UART1_ACTIVE,
-    UART2_ACTIVE
-} uart_state_t;
-
-
-static uart_state_t current_uart = UART1_ACTIVE;
-
 void uart_event_handler_1(nrfx_uarte_event_t const *p_event, void *p_context);
 void uart_event_handler_2(nrfx_uarte_event_t const *p_event, void *p_context);
 
@@ -112,21 +96,3 @@ ret_code_t app_uart_module_uninit(void)
   return (ret_code_t)app_uart_close();
 }
 
-
-// Fonction pour configurer les pins de l'UART
-void uart_configure_pins(uint32_t rx_pin, uint32_t tx_pin) {
-    nrfx_uarte_uninit(&uarte); // Désinitialisation
-    nrfx_uarte_config_t config = NRFX_UARTE_DEFAULT_CONFIG;
-    config.pselrxd = rx_pin;
-    config.pseltxd = tx_pin;
-    config.hwfc = NRF_UARTE_HWFC_DISABLED; // Pas de contrôle de flux
-    APP_ERROR_CHECK(nrfx_uarte_init(&uarte, &config, NULL));
-}
-
-
-// Fonction pour lire les données et transférer
-void uart_transfer(uint32_t src_rx_pin, uint32_t dst_tx_pin) {
-    uart_configure_pins(src_rx_pin, dst_tx_pin); // Configurer pour la source/destination
-    nrfx_uarte_rx(&uarte, rx_buffer, 1);        // Lire un octet (bloquant dans cet exemple)
-    nrfx_uarte_tx(&uarte, rx_buffer, 1);        // Envoyer cet octet
-}
