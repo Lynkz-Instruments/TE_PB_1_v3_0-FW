@@ -12,6 +12,7 @@
 
 #include "app_peripherals.h"
 #include "app_settings.h"
+#include "app_ppi.h"
 
 #define RTC_FREQUENCY_HZ 100 // give a period of 1 sec to RTC
 #define RTC_PRESACLER (32768 / RTC_FREQUENCY_HZ) - 1
@@ -226,7 +227,15 @@ static void gpio_init(void)
   nrf_gpio_cfg(TAG_PWR, NRF_GPIO_PIN_DIR_OUTPUT, NRF_GPIO_PIN_INPUT_DISCONNECT, NRF_GPIO_PIN_NOPULL, NRF_GPIO_PIN_S0D1, NRF_GPIO_PIN_NOSENSE);
 
   // UART config
+    //nrf_drv_gpiote_in_config_t in_config = GPIOTE_CONFIG_IN_SENSE_TOGGLE(false); // Sensibilité au changement d'état
+    //in_config.pull = NRF_GPIO_PIN_NOPULL;
+    //nrf_drv_gpiote_in_init(UART_RX_PIN_NUMBER, &in_config, NULL);
+    //nrf_drv_gpiote_in_init(TAG_RX_PIN_NUMBER, &in_config, NULL);
+    //nrf_drv_gpiote_in_init(BV_TX_PIN_NUMBER, &in_config, NULL);
 
+    //nrf_drv_gpiote_out_config_t out_config = GPIOTE_CONFIG_OUT_TASK_TOGGLE(true);
+    //nrf_drv_gpiote_out_init(UART_TX_PIN_NUMBER, &out_config);
+    //nrf_drv_gpiote_out_init(TAG_TX_PIN_NUMBER, &out_config);
 
   app_hdw_set_INT_STCO_led(false);
   app_hdw_set_INT_BV_led(false);
@@ -298,14 +307,23 @@ void app_hdw_select_UART()
   case 0:
     app_hdw_set_UART1_led(false);
     app_hdw_set_UART2_led(false);
+    disable_ppi_channel(0);
+    disable_ppi_channel(1);
+    //disable_ppi_channel(2);
     break;
   case 1:
     app_hdw_set_UART1_led(true);
     app_hdw_set_UART2_led(false);
+    enable_ppi_channel(0);
+    enable_ppi_channel(1);
+    //disable_ppi_channel(2);
     break;
   case 2:
     app_hdw_set_UART1_led(false);
     app_hdw_set_UART2_led(true);
+    disable_ppi_channel(0);
+    disable_ppi_channel(1);
+    //enable_ppi_channel(2);
     break;
 
   
