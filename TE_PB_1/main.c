@@ -29,15 +29,70 @@
 
 /**@brief Function for application main entry.
  */
+#include "nrf_uarte.h"
+#include "nrf_ppi.h"
+#include "nrf_drv_ppi.h"
+#include "app_error.h"
+
+#define UART_RX_PIN  8  // Pin de réception
+#define UART_TX_PIN  6  // Pin de transmission
+
+static uint8_t rx_buffer[1];  // Buffer pour un caractère reçu
+static uint8_t tx_buffer[1];  // Buffer pour un caractère à envoyer
 
 
-// État actif : UART1 ou UART2
-typedef enum {
-    UART1_ACTIVE,
-    UART2_ACTIVE
-} uart_state_t;
+#include "nrf_gpio.h"
+#include "nrf_drv_gpiote.h"
+#include "nrf_drv_ppi.h"
+#include "app_error.h"
 
-static uart_state_t current_uart = UART1_ACTIVE;
+#define UART_RX_PIN  8  // Pin de réception UART
+#define UART_TX_PIN  6  // Pin de transmission UART
+
+void ppi_uart_init(void)
+{
+    ret_code_t err_code;
+
+    // 1. Initialiser GPIOTE
+    if (!nrf_drv_gpiote_is_init())
+    {
+        err_code = nrf_drv_gpiote_init();
+        APP_ERROR_CHECK(err_code);
+    }
+
+    // 2. Configurer GPIOTE pour la broche RX (événement sur changement d'état)
+    nrf_drv_gpiote_in_config_t in_config = GPIOTE_CONFIG_IN_SENSE_TOGGLE(false); // Sensibilité au changement d'état
+    in_config.pull = NRF_GPIO_PIN_NOPULL;
+
+    err_code = nrf_drv_gpiote_in_init(UART_RX_PIN_NUMBER, &in_config, NULL);
+    APP_ERROR_CHECK(err_code);
+    nrf_drv_gpiote_in_event_enable(UART_RX_PIN_NUMBER, true); // Activer les événements sur RX
+
+    // 3. Configurer GPIOTE pour la broche TX (tâche de sortie)
+    nrf_drv_gpiote_out_config_t out_config = GPIOTE_CONFIG_OUT_TASK_TOGGLE(true);
+    err_code = nrf_drv_gpiote_out_init(UART_TX_PIN_NUMBER, &out_config);
+    APP_ERROR_CHECK(err_code);
+    nrf_drv_gpiote_out_task_enable(UART_TX_PIN_NUMBER); // Activer les tâches sur TX
+
+    // 4. Initialiser PPI
+    nrf_ppi_channel_t ppi_channel;
+    err_code = nrf_drv_ppi_init();
+    APP_ERROR_CHECK(err_code);
+
+    // 5. Assigner PPI : relier l'événement RX à la tâche TX
+    err_code = nrf_drv_ppi_channel_alloc(&ppi_channel);
+    APP_ERROR_CHECK(err_code);
+
+    err_code = nrf_drv_ppi_channel_assign(ppi_channel,
+                                          nrf_drv_gpiote_in_event_addr_get(UART_RX_PIN_NUMBER),
+                                          nrf_drv_gpiote_out_task_addr_get(UART_TX_PIN_NUMBER));
+    APP_ERROR_CHECK(err_code);
+
+    // 6. Activer le canal PPI
+    err_code = nrf_drv_ppi_channel_enable(ppi_channel);
+    APP_ERROR_CHECK(err_code);
+}
+
 
 int main(void)
 {
@@ -78,6 +133,8 @@ int main(void)
   app_task_set_advertising(true);
   #endif
 
+  ppi_uart_init();
+
   // Start application execution. 
   NRF_LOG_INFO("INIT DONE: SMARTLINER APP STARTED!");
   
@@ -91,7 +148,7 @@ int main(void)
   // Setup Tasks based on memory config
   setup_tasks();
 
-  uart_configure_pins(UART_RX_PIN_NUMBER, UART_TX_PIN_NUMBER);
+  //uart_configure_pins(UART_RX_PIN_NUMBER, UART_TX_PIN_NUMBER);
 
   while(true)
   {
@@ -106,16 +163,4 @@ int main(void)
     /* Call SoftDevice Wait For event */
     sd_app_evt_wait();
   }
-
-   while (true) {
-        //if (current_uart == UART1_ACTIVE) {
-        //    // Lire depuis UART1 et envoyer à UART2
-        //    uart_transfer(UART_RX_PIN_NUMBER, TAG_TX_PIN_NUMBER);
-        //    current_uart = UART2_ACTIVE; // Basculer vers UART2
-        //} else {
-        //    // Lire depuis UART2 et envoyer à UART1
-        //    uart_transfer(TAG_RX_PIN_NUMBER, UART_TX_PIN_NUMBER);
-        //    current_uart = UART1_ACTIVE; // Basculer vers UART1
-        //}
-    }
 }
