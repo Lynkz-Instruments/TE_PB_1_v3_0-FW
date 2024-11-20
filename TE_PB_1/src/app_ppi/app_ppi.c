@@ -81,3 +81,23 @@ void disable_ppi_channel(uint8_t channel_index)
     ret_code_t err_code = nrf_drv_ppi_channel_disable(ppi_channels[channel_index]);
     APP_ERROR_CHECK(err_code);
 }
+
+void free_ppi_channel(uint8_t channel_index, uint32_t event_address, uint32_t task_address)
+{
+    if (channel_index >= MAX_PPI_CHANNELS)
+    {
+        APP_ERROR_HANDLER(NRF_ERROR_INVALID_PARAM);
+    }
+
+    // Désactiver le canal PPI
+    nrf_drv_ppi_channel_disable(ppi_channels[channel_index]);
+    ret_code_t err_code = nrf_drv_ppi_channel_free(ppi_channels[channel_index]);
+    APP_ERROR_CHECK(err_code);
+
+    nrf_drv_gpiote_in_event_disable(event_address);
+    nrf_drv_gpiote_out_task_disable(task_address);
+
+    nrf_drv_gpiote_in_uninit(event_address); // Activer les événements sur RX
+    nrf_drv_gpiote_out_uninit(task_address); // Activer les tâches sur TX
+    ppi_channels[channel_index] = 0;
+}

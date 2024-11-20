@@ -75,12 +75,7 @@ int main(void)
 
   ppi_init();
 
-  configure_ppi_channel(0, UART_RX_PIN_NUMBER, TAG_TX_PIN_NUMBER);
-  configure_ppi_channel(1, TAG_RX_PIN_NUMBER, UART_TX_PIN_NUMBER);
-  //configure_ppi_channel(2, BV_TX_PIN_NUMBER, UART_TX_PIN_NUMBER);
-  disable_ppi_channel(0);
-  disable_ppi_channel(1);
-  //disable_ppi_channel(2);
+
 
   // Start application execution. 
   NRF_LOG_INFO("INIT DONE: SMARTLINER APP STARTED!");
