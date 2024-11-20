@@ -65,6 +65,27 @@ void app_uart_module_event_handler(app_uart_evt_t * p_event)
   }
 }
 
+ret_code_t app_uart_init_PB(void)
+{
+  uint32_t err_code;
+  const app_uart_comm_params_t comm_params =
+  {
+    UART_RX_PIN_NUMBER,
+    UART_TX_PIN_NUMBER,
+    SERIAL_RTS_PIN,
+    SERIAL_CTS_PIN,
+    APP_UART_FLOW_CONTROL_DISABLED,
+    false,
+    NRF_UART_BAUDRATE_115200
+  };
+
+  err_code = app_uart_init(&comm_params, NULL,  app_uart_module_event_handler, APP_IRQ_PRIORITY_LOWEST);
+
+  APP_ERROR_CHECK(err_code);
+  return err_code;
+}
+
+
 ret_code_t app_uart_module_write(const uint8_t * p_data, const uint32_t size, uint32_t timeout_ms)
 {
   ret_code_t err_code;

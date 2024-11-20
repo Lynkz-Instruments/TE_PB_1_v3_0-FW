@@ -39,7 +39,7 @@ extern "C" {
 
 
 #define SERIAL_RTS_PIN 0xFF
-#define SERIAL_CTS_PIN 0xFF.
+#define SERIAL_CTS_PIN 0xFF
 
 //Analog Switch Default Pin Definition
 #define SW1 23 // Analog switch to connect the red terminal to the TAG's STCO input

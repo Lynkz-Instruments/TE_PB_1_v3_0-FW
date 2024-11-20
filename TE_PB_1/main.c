@@ -75,12 +75,8 @@ int main(void)
 
   ppi_init();
 
-
-
   // Start application execution. 
   NRF_LOG_INFO("INIT DONE: SMARTLINER APP STARTED!");
-  
-
 
   if (!is_ble_user_connected()){
     advertising_stop();

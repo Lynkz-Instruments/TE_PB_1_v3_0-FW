@@ -15,6 +15,7 @@
 #include <stdint.h>
 #include "sdk_errors.h"
 
+ret_code_t app_uart_init_PB(void);
 
 /**
  * @brief Function to write on UART TX buffer.

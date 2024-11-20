@@ -56,6 +56,8 @@ void configure_ppi_channel(uint8_t channel_index, uint32_t event_address, uint32
                                           nrf_drv_gpiote_in_event_addr_get(event_address),
                                           nrf_drv_gpiote_out_task_addr_get(task_address));
     APP_ERROR_CHECK(err_code);
+    enable_ppi_channel(channel_index);
+
 }
 
 void enable_ppi_channel(uint8_t channel_index)

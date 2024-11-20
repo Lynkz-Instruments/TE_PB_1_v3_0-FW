@@ -237,10 +237,8 @@ static void gpio_init(void)
     //nrf_drv_gpiote_out_init(UART_TX_PIN_NUMBER, &out_config);
     //nrf_drv_gpiote_out_init(TAG_TX_PIN_NUMBER, &out_config);
 
-  app_hdw_set_INT_STCO_led(false);
-  app_hdw_set_INT_BV_led(false);
-  app_hdw_set_UART1_led(false);
-  app_hdw_set_UART2_led(false);
+  app_hdw_select_UART();
+  app_hdw_select_mode();
 }
 
 void app_hdw_select_mode()
@@ -308,14 +306,14 @@ void app_hdw_select_UART()
     app_hdw_set_UART1_led(false);
     app_hdw_set_UART2_led(false);
     free_ppi_channel(0, BV_TX_PIN_NUMBER, UART_TX_PIN_NUMBER);    
+    app_uart_init_PB();
   break;
   case 1:
     app_hdw_set_UART1_led(true);
     app_hdw_set_UART2_led(false);
     configure_ppi_channel(0, UART_RX_PIN_NUMBER, TAG_TX_PIN_NUMBER);
     configure_ppi_channel(1, TAG_RX_PIN_NUMBER, UART_TX_PIN_NUMBER);
-    enable_ppi_channel(0);
-    enable_ppi_channel(1);
+    app_uart_module_uninit();
     break;
   case 2:
     app_hdw_set_UART1_led(false);
@@ -323,7 +321,6 @@ void app_hdw_select_UART()
     free_ppi_channel(0, UART_RX_PIN_NUMBER, TAG_TX_PIN_NUMBER);
     free_ppi_channel(1, TAG_RX_PIN_NUMBER, UART_TX_PIN_NUMBER);
     configure_ppi_channel(0, BV_TX_PIN_NUMBER, UART_TX_PIN_NUMBER);
-    enable_ppi_channel(0);
     break;
 
   
