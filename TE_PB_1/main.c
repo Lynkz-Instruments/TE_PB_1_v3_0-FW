@@ -19,6 +19,7 @@
 #include "app_uart_module.h"
 #include "app_ppi.h"
 #include "app_saadc.h"
+#include "app_communication.h"
 
 // 0 -> No log
 // 1 -> Error only
@@ -31,7 +32,6 @@
 
 /**@brief Function for application main entry.
  */
-
 
 
 

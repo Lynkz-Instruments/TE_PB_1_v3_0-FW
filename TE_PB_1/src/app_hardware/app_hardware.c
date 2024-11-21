@@ -26,7 +26,7 @@
 
 uint8_t mode = 0;
 uint8_t uart_conf = 0;
-bool uart_ble = false;
+bool uart_ble = true;
 
 static bool interrupt_initialized = false;
 
@@ -357,7 +357,7 @@ void app_hdw_select_UART()
       err_code = app_uart_module_uninit();
       APP_ERROR_CHECK(err_code);
 
-      err_code = app_uart_init_BV();
+      err_code = app_uart_init_TAG();
       APP_ERROR_CHECK(err_code);
 
     break;
@@ -369,7 +369,7 @@ void app_hdw_select_UART()
       err_code = app_uart_module_uninit();
       APP_ERROR_CHECK(err_code);
 
-      err_code = app_uart_init_TAG();
+      err_code = app_uart_init_BV();
       APP_ERROR_CHECK(err_code);
 
       break;
@@ -380,7 +380,7 @@ void app_hdw_select_UART()
     }
   }
 
-  NRF_LOG_INFO("UART : %d", uart_conf);
+  NRF_LOG_INFO("UART_BLE : %d", uart_conf);
 
 
 }
@@ -530,7 +530,7 @@ void app_hdw_read_V_BAT()
   }
   output_value /= count;
 
-  NRF_LOG_INFO("VOLTAGE RAW: %d", output_value);
+  //NRF_LOG_INFO("VOLTAGE RAW: %d", output_value);
   if (voltage < V_BAT_TRHL){
     app_hdw_set_low_bat_led(true);
   }
@@ -547,7 +547,7 @@ void app_hdw_detect_TAG()
     }
       app_hdw_set_TAG_pwr(false);
   }
-    NRF_LOG_INFO("TAG Detection");
+    //NRF_LOG_INFO("TAG Detection");
 
 }
 
@@ -606,7 +606,8 @@ void mode_button_interrupt_init(void) {
 
 void app_hdw_set_uart_ble(bool enable) {
   uart_ble = enable;
-  NRF_LOG_INFO("UART_BLE : %d", enable);
+  app_hdw_select_UART();
+  NRF_LOG_INFO("UART_BLE_ENABLE : %d", enable);
 
 }
 

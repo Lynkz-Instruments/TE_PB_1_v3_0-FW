@@ -58,5 +58,6 @@ void app_comm_send_fail(void);
  * @brief Function to send an empty message. Essentialy an "empty" message.
  */
 void app_comm_send_empty(void);
+void app_comm_send_packet(uint8_t * data, uint8_t len);
 
 #endif // APP_COMMUNICATION_H
