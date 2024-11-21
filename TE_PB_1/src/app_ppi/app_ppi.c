@@ -8,7 +8,7 @@
 
 static nrf_ppi_channel_t ppi_channels[MAX_PPI_CHANNELS]; // Tableau pour les canaux PPI
 
-void ppi_init(void)
+void app_ppi_init(void)
 {
     ret_code_t err_code;
 
@@ -24,7 +24,7 @@ void ppi_init(void)
     }
 }
 
-void configure_ppi_channel(uint8_t channel_index, uint32_t event_address, uint32_t task_address)
+void app_ppi_configure_channel(uint8_t channel_index, uint32_t event_address, uint32_t task_address)
 {
     ret_code_t err_code;
 
@@ -56,11 +56,11 @@ void configure_ppi_channel(uint8_t channel_index, uint32_t event_address, uint32
                                           nrf_drv_gpiote_in_event_addr_get(event_address),
                                           nrf_drv_gpiote_out_task_addr_get(task_address));
     APP_ERROR_CHECK(err_code);
-    enable_ppi_channel(channel_index);
+    app_ppi_enable_channel(channel_index);
 
 }
 
-void enable_ppi_channel(uint8_t channel_index)
+void app_ppi_enable_channel(uint8_t channel_index)
 {
     if (channel_index >= MAX_PPI_CHANNELS)
     {
@@ -72,7 +72,7 @@ void enable_ppi_channel(uint8_t channel_index)
     APP_ERROR_CHECK(err_code);
 }
 
-void disable_ppi_channel(uint8_t channel_index)
+void app_ppi_disable_channel(uint8_t channel_index)
 {
     if (channel_index >= MAX_PPI_CHANNELS)
     {
@@ -84,7 +84,7 @@ void disable_ppi_channel(uint8_t channel_index)
     APP_ERROR_CHECK(err_code);
 }
 
-void free_ppi_channel(uint8_t channel_index, uint32_t event_address, uint32_t task_address)
+void app_ppi_free_channel(uint8_t channel_index, uint32_t event_address, uint32_t task_address)
 {
     if (channel_index >= MAX_PPI_CHANNELS)
     {

@@ -307,7 +307,7 @@ void app_hdw_select_UART()
   case 0:
     app_hdw_set_UART1_led(false);
     app_hdw_set_UART2_led(false);
-    free_ppi_channel(0, BV_TX_PIN_NUMBER, UART_TX_PIN_NUMBER);
+    app_ppi_free_channel(0, BV_TX_PIN_NUMBER, UART_TX_PIN_NUMBER);
 
      
     err_code = app_uart_init_PB();
@@ -322,17 +322,17 @@ void app_hdw_select_UART()
 
     err_code = app_uart_module_uninit();
     APP_ERROR_CHECK(err_code);
-    configure_ppi_channel(0, UART_RX_PIN_NUMBER, TAG_TX_PIN_NUMBER);
-    configure_ppi_channel(1, TAG_RX_PIN_NUMBER, UART_TX_PIN_NUMBER);
+    app_ppi_configure_channel(0, UART_RX_PIN_NUMBER, TAG_TX_PIN_NUMBER);
+    app_ppi_configure_channel(1, TAG_RX_PIN_NUMBER, UART_TX_PIN_NUMBER);
 
   break;
 
   case 2:
     app_hdw_set_UART1_led(false);
     app_hdw_set_UART2_led(true);
-    free_ppi_channel(0, UART_RX_PIN_NUMBER, TAG_TX_PIN_NUMBER);
-    free_ppi_channel(1, TAG_RX_PIN_NUMBER, UART_TX_PIN_NUMBER);
-    configure_ppi_channel(0, BV_TX_PIN_NUMBER, UART_TX_PIN_NUMBER);
+    app_ppi_free_channel(0, UART_RX_PIN_NUMBER, TAG_TX_PIN_NUMBER);
+    app_ppi_free_channel(1, TAG_RX_PIN_NUMBER, UART_TX_PIN_NUMBER);
+    app_ppi_configure_channel(0, BV_TX_PIN_NUMBER, UART_TX_PIN_NUMBER);
 
     break;
 

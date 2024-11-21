@@ -73,7 +73,7 @@ int main(void)
   app_task_set_advertising(true);
   #endif
 
-  ppi_init();
+  app_ppi_init();
 
   // Start application execution. 
   NRF_LOG_INFO("INIT DONE: SMARTLINER APP STARTED!");
