@@ -50,9 +50,9 @@ extern "C" {
 #define SW6 27 // Analog switch to connect Bavard's filter circuit when the Internal Bavard is used
 
 //STARTCO Default Pin Definition
-#define STCO_OK 9 // HIGH if GND Check is passed
-#define STCO_OPEN_Z 20 // HIGH if GND Check says OPEN CIRCUIT
-#define STCO_SHORT_Z 24 // HIGH if GND Check says SHORT CIRCUIT
+#define STCO_OK_PIN 9 // HIGH if GND Check is passed
+#define STCO_OPEN_Z_PIN 20 // HIGH if GND Check says OPEN CIRCUIT
+#define STCO_SHORT_Z_PIN 24 // HIGH if GND Check says SHORT CIRCUIT
 
 //Buttons Default Pin Definition
 #define UART_SELECTOR_BTN 13 // Selector to chose which device communicate with UART through USB

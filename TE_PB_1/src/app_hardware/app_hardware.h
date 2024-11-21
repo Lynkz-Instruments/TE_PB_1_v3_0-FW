@@ -30,6 +30,12 @@
 #include "lynkz_utils.h"
 #include "scheduler.h"
 
+typedef enum{
+STCO_ERROR = 0,
+STCO_OK = 1,
+STCO_OPEN_Z = 2,
+STCO_SHORT_Z = 3,
+} STARTCO_t;
 
 #define WAKE_UP_TIME_SEC 0.1 // Wake up time in seconds
 
@@ -142,6 +148,13 @@ void app_hdw_read_UART_BTN();
  * 
  */
 void app_hdw_read_V_BAT();
+
+/**
+ * @brief Function to read the STARTCO state
+ * 
+ */
+STARTCO_t app_hdw_read_STCO();
+
 
 /**
  * @brief Function to detect a TAG's presence and ensure it is powered.

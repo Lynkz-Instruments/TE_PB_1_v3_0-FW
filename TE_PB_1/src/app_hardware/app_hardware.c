@@ -214,9 +214,9 @@ static void gpio_init(void)
  
   NRF_LOG_INFO("STCO_PINS");
   // STARTCO SENS (À VÉRIFIER)
-  nrf_gpio_cfg(STCO_OK, NRF_GPIO_PIN_DIR_INPUT, NRF_GPIO_PIN_INPUT_DISCONNECT, NRF_GPIO_PIN_NOPULL, NRF_GPIO_PIN_S0D1, NRF_GPIO_PIN_NOSENSE);
-  nrf_gpio_cfg(STCO_OPEN_Z, NRF_GPIO_PIN_DIR_INPUT, NRF_GPIO_PIN_INPUT_DISCONNECT, NRF_GPIO_PIN_NOPULL, NRF_GPIO_PIN_S0D1, NRF_GPIO_PIN_NOSENSE);
-  nrf_gpio_cfg(STCO_SHORT_Z, NRF_GPIO_PIN_DIR_INPUT, NRF_GPIO_PIN_INPUT_DISCONNECT, NRF_GPIO_PIN_NOPULL, NRF_GPIO_PIN_S0D1, NRF_GPIO_PIN_NOSENSE);
+  nrf_gpio_cfg(STCO_OK_PIN, NRF_GPIO_PIN_DIR_INPUT, NRF_GPIO_PIN_INPUT_DISCONNECT, NRF_GPIO_PIN_NOPULL, NRF_GPIO_PIN_S0D1, NRF_GPIO_PIN_NOSENSE);
+  nrf_gpio_cfg(STCO_OPEN_Z_PIN, NRF_GPIO_PIN_DIR_INPUT, NRF_GPIO_PIN_INPUT_DISCONNECT, NRF_GPIO_PIN_NOPULL, NRF_GPIO_PIN_S0D1, NRF_GPIO_PIN_NOSENSE);
+  nrf_gpio_cfg(STCO_SHORT_Z_PIN, NRF_GPIO_PIN_DIR_INPUT, NRF_GPIO_PIN_INPUT_DISCONNECT, NRF_GPIO_PIN_NOPULL, NRF_GPIO_PIN_S0D1, NRF_GPIO_PIN_NOSENSE);
 
   NRF_LOG_INFO("SWITCHES_PINS");
   // Analog Switches 
@@ -483,7 +483,7 @@ void app_hdw_read_V_BAT()
 
 void app_hdw_detect_TAG()
 {
-  if ((bool)nrf_gpio_pin_read(STCO_OK)){
+  if (app_hdw_read_STCO() == STCO_OK){
     nrf_delay_ms(1000);
     if (!(bool)nrf_gpio_pin_read(TAG_PWR_SENS)){
       app_hdw_set_TAG_pwr(true);
@@ -492,7 +492,19 @@ void app_hdw_detect_TAG()
   }
 }
 
-
+STARTCO_t app_hdw_read_STCO() {
+  STARTCO_t STCO_state = STCO_ERROR;
+  if ((bool)nrf_gpio_pin_read(STCO_OK_PIN)){
+    STCO_state = STCO_OK;
+  }
+  else if ((bool)nrf_gpio_pin_read(STCO_OPEN_Z_PIN)) {
+    STCO_state = STCO_OPEN_Z;
+  }
+  else if ((bool)nrf_gpio_pin_read(STCO_SHORT_Z_PIN)) {
+    STCO_state = STCO_SHORT_Z;
+  }
+  return STCO_state;
+}
 
 void buttons_interrupt_init(void)
 {
