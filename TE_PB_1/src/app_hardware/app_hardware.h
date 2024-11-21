@@ -162,5 +162,6 @@ STARTCO_t app_hdw_read_STCO();
  */
 void app_hdw_detect_TAG();
 
+void app_hdw_set_uart_ble(bool enable);
 
 #endif // APP_HARDWARE_H

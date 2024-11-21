@@ -26,6 +26,7 @@
 
 uint8_t mode = 0;
 uint8_t uart_conf = 0;
+bool uart_ble = false;
 
 static bool interrupt_initialized = false;
 
@@ -294,43 +295,91 @@ void app_hdw_select_UART()
 {
 
   ret_code_t err_code;
-  switch (uart_conf)
-  { 
-  case 0:
-    app_hdw_set_UART1_led(false);
-    app_hdw_set_UART2_led(false);
-    app_ppi_free_channel(0, BV_RX_PIN_NUMBER, UART_TX_PIN_NUMBER);
+
+  if (!uart_ble) {
+    switch (uart_conf)
+    { 
+    case 0:
+      app_hdw_set_UART1_led(false);
+      app_hdw_set_UART2_led(false);
+      app_ppi_free_channel(0, BV_RX_PIN_NUMBER, UART_TX_PIN_NUMBER);
 
      
-    err_code = app_uart_init_PB();
-    APP_ERROR_CHECK(err_code);
-
-  break;
-
-  case 1:
-    app_hdw_set_UART1_led(true);
-    app_hdw_set_UART2_led(false);
-
-    err_code = app_uart_module_uninit();
-    APP_ERROR_CHECK(err_code);
-    app_ppi_configure_channel(0, UART_RX_PIN_NUMBER, TAG_TX_PIN_NUMBER);
-    app_ppi_configure_channel(1, TAG_RX_PIN_NUMBER, UART_TX_PIN_NUMBER);
-
-  break;
-
-  case 2:
-    app_hdw_set_UART1_led(false);
-    app_hdw_set_UART2_led(true);
-    app_ppi_free_channel(0, UART_RX_PIN_NUMBER, TAG_TX_PIN_NUMBER);
-    app_ppi_free_channel(1, TAG_RX_PIN_NUMBER, UART_TX_PIN_NUMBER);
-    app_ppi_configure_channel(0, BV_RX_PIN_NUMBER, UART_TX_PIN_NUMBER);
+      err_code = app_uart_init_PB();
+      APP_ERROR_CHECK(err_code);
 
     break;
 
-  
-  default:
+    case 1:
+      app_hdw_set_UART1_led(true);
+      app_hdw_set_UART2_led(false);
+
+      err_code = app_uart_module_uninit();
+      APP_ERROR_CHECK(err_code);
+      app_ppi_configure_channel(0, UART_RX_PIN_NUMBER, TAG_TX_PIN_NUMBER);
+      app_ppi_configure_channel(1, TAG_RX_PIN_NUMBER, UART_TX_PIN_NUMBER);
+
+    break;
+
+    case 2:
+      app_hdw_set_UART1_led(false);
+      app_hdw_set_UART2_led(true);
+      app_ppi_free_channel(0, UART_RX_PIN_NUMBER, TAG_TX_PIN_NUMBER);
+      app_ppi_free_channel(1, TAG_RX_PIN_NUMBER, UART_TX_PIN_NUMBER);
+      app_ppi_configure_channel(0, BV_RX_PIN_NUMBER, UART_TX_PIN_NUMBER);
+
       break;
+
+  
+    default:
+        break;
+    }
   }
+  else {
+    switch (uart_conf)
+    { 
+    case 0:
+      app_hdw_set_UART1_led(false);
+      app_hdw_set_UART2_led(false);
+
+      err_code = app_uart_module_uninit();
+      APP_ERROR_CHECK(err_code);
+
+      err_code = app_uart_init_PB();
+      APP_ERROR_CHECK(err_code);
+
+    break;
+
+    case 1:
+      app_hdw_set_UART1_led(true);
+      app_hdw_set_UART2_led(false);
+
+      err_code = app_uart_module_uninit();
+      APP_ERROR_CHECK(err_code);
+
+      err_code = app_uart_init_BV();
+      APP_ERROR_CHECK(err_code);
+
+    break;
+
+    case 2:
+      app_hdw_set_UART1_led(false);
+      app_hdw_set_UART2_led(true);
+
+      err_code = app_uart_module_uninit();
+      APP_ERROR_CHECK(err_code);
+
+      err_code = app_uart_init_TAG();
+      APP_ERROR_CHECK(err_code);
+
+      break;
+
+  
+    default:
+        break;
+    }
+  }
+
   NRF_LOG_INFO("UART : %d", uart_conf);
 
 
@@ -554,5 +603,12 @@ void mode_button_interrupt_init(void) {
 
   nrf_drv_gpiote_in_init(MODE_SELECTOR_BTN, &in_config, app_hdw_read_mode_BTN);
 }
+
+void app_hdw_set_uart_ble(bool enable) {
+  uart_ble = enable;
+  NRF_LOG_INFO("UART_BLE : %d", enable);
+
+}
+
 
 
