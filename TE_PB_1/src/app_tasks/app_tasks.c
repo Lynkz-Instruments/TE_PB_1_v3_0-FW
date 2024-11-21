@@ -157,6 +157,8 @@ void setup_tasks(void)
 
   SCH_Add_Task(app_hdw_read_V_BAT, 0, SEC_TO_TICK(2), false);
 
+  SCH_Add_Task(app_hdw_detect_TAG, 0, SEC_TO_TICK(1), false);
+
 
 }
 

@@ -33,7 +33,7 @@ static void event_handler(nrfx_saadc_evt_t const *p_event) {
 ret_code_t app_saadc_init(void)
 {
   ret_code_t err_code;
-  nrfx_saadc_config_t saadc_config = {.resolution = NRF_SAADC_RESOLUTION_12BIT,
+  nrfx_saadc_config_t saadc_config = {.resolution = NRF_SAADC_RESOLUTION_8BIT,
                                       .oversample = NRF_SAADC_OVERSAMPLE_DISABLED,
                                       .interrupt_priority = 6,
                                       .low_power_mode = true};

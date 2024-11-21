@@ -21,7 +21,7 @@
 #define NB_MODE 4
 #define NB_UART_CONF 3
 
-#define V_BAT_TRHL 2000
+#define V_BAT_TRHL 150
 
 uint8_t mode = 0;
 uint8_t uart_conf = 0;
@@ -471,8 +471,17 @@ void app_hdw_read_UART_BTN()
 void app_hdw_read_V_BAT()
 {
   nrf_saadc_value_t voltage;
-  app_saadc_get_channel(0, &voltage);
-  NRF_LOG_INFO("VOLTAGE RAW: %d", voltage);
+  int32_t output_value = 0;
+  uint8_t i;
+  uint8_t count = 1;
+
+  for (i = 0; i < count; i++) {
+    app_saadc_get_channel(0, &voltage);
+    output_value += voltage;
+  }
+  output_value /= count;
+
+  NRF_LOG_INFO("VOLTAGE RAW: %d", output_value);
   if (voltage < V_BAT_TRHL){
     app_hdw_set_low_bat_led(true);
   }
@@ -484,12 +493,13 @@ void app_hdw_read_V_BAT()
 void app_hdw_detect_TAG()
 {
   if (app_hdw_read_STCO() == STCO_OK){
-    nrf_delay_ms(1000);
     if (!(bool)nrf_gpio_pin_read(TAG_PWR_SENS)){
       app_hdw_set_TAG_pwr(true);
     }
       app_hdw_set_TAG_pwr(false);
   }
+    NRF_LOG_INFO("TAG Detection");
+
 }
 
 STARTCO_t app_hdw_read_STCO() {
@@ -544,3 +554,5 @@ void mode_button_interrupt_init(void) {
 
   nrf_drv_gpiote_in_init(MODE_SELECTOR_BTN, &in_config, app_hdw_read_mode_BTN);
 }
+
+
