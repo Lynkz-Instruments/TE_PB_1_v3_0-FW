@@ -94,9 +94,14 @@ bool app_hdw_init(void)
   rtc_init();
 
   // Init GPIOs
-  NRF_LOG_INFO("GPIO_INIT_START");
   gpio_init();
-  NRF_LOG_INFO("GPIO_INIT_END");
+
+  // Initial condition
+  mode = 0;
+  uart_conf = 0;
+  app_hdw_select_UART();
+  app_hdw_select_mode();
+
   buttons_interrupt_init();
 
   return true;
@@ -197,11 +202,6 @@ static void gpio_init(void)
   nrf_gpio_cfg(MUX1_UART_LED, NRF_GPIO_PIN_DIR_OUTPUT, NRF_GPIO_PIN_INPUT_DISCONNECT, NRF_GPIO_PIN_NOPULL, NRF_GPIO_PIN_S0D1, NRF_GPIO_PIN_NOSENSE);
   nrf_gpio_cfg(MUX2_UART_LED, NRF_GPIO_PIN_DIR_OUTPUT, NRF_GPIO_PIN_INPUT_DISCONNECT, NRF_GPIO_PIN_NOPULL, NRF_GPIO_PIN_S0D1, NRF_GPIO_PIN_NOSENSE);
   nrf_gpio_cfg(LOW_BAT_LED, NRF_GPIO_PIN_DIR_OUTPUT, NRF_GPIO_PIN_INPUT_DISCONNECT, NRF_GPIO_PIN_NOPULL, NRF_GPIO_PIN_S0D1, NRF_GPIO_PIN_NOSENSE);
-  
-  NRF_LOG_INFO("BUTTON_PINS");
-  // Buttons (À VÉRIFIER)
-  //nrf_gpio_cfg(UART_SELECTOR_BTN, NRF_GPIO_PIN_DIR_INPUT, NRF_GPIO_PIN_INPUT_DISCONNECT, NRF_GPIO_PIN_NOPULL, NRF_GPIO_PIN_S0D1, NRF_GPIO_PIN_NOSENSE);
-  //nrf_gpio_cfg(MODE_SELECTOR_BTN, NRF_GPIO_PIN_DIR_INPUT, NRF_GPIO_PIN_INPUT_DISCONNECT, NRF_GPIO_PIN_NOPULL, NRF_GPIO_PIN_S0D1, NRF_GPIO_PIN_NOSENSE);
 
   NRF_LOG_INFO("POWER_SENS");
   // Power SENS (À VÉRIFIER)
@@ -226,19 +226,6 @@ static void gpio_init(void)
   // TAG power
   nrf_gpio_cfg(TAG_PWR, NRF_GPIO_PIN_DIR_OUTPUT, NRF_GPIO_PIN_INPUT_DISCONNECT, NRF_GPIO_PIN_NOPULL, NRF_GPIO_PIN_S0D1, NRF_GPIO_PIN_NOSENSE);
 
-  // UART config
-    //nrf_drv_gpiote_in_config_t in_config = GPIOTE_CONFIG_IN_SENSE_TOGGLE(false); // Sensibilité au changement d'état
-    //in_config.pull = NRF_GPIO_PIN_NOPULL;
-    //nrf_drv_gpiote_in_init(UART_RX_PIN_NUMBER, &in_config, NULL);
-    //nrf_drv_gpiote_in_init(TAG_RX_PIN_NUMBER, &in_config, NULL);
-    //nrf_drv_gpiote_in_init(BV_RX_PIN_NUMBER, &in_config, NULL);
-
-    //nrf_drv_gpiote_out_config_t out_config = GPIOTE_CONFIG_OUT_TASK_TOGGLE(true);
-    //nrf_drv_gpiote_out_init(UART_TX_PIN_NUMBER, &out_config);
-    //nrf_drv_gpiote_out_init(TAG_TX_PIN_NUMBER, &out_config);
-
-  app_hdw_select_UART();
-  app_hdw_select_mode();
 }
 
 void app_hdw_select_mode()
