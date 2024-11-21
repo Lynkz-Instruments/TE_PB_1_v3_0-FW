@@ -42,7 +42,7 @@ ret_code_t app_saadc_init(void)
   APP_ERROR_CHECK(err_code);
 
   // Create configurations for the channels
-  nrf_saadc_channel_config_t battery_config = NRF_DRV_SAADC_DEFAULT_CHANNEL_CONFIG_SE(NRF_SAADC_INPUT_VDD);
+  nrf_saadc_channel_config_t battery_config = NRF_DRV_SAADC_DEFAULT_CHANNEL_CONFIG_SE(NRF_SAADC_INPUT_AIN1);
   
   // Initialize each channel
   err_code = nrfx_saadc_channel_init(0, &battery_config);

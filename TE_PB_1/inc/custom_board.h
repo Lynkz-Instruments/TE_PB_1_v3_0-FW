@@ -14,16 +14,17 @@ extern "C" {
 #endif
 
 //LEDS Default Pin Definition
-//#define INT_STCO_LED 29 // Internal STARTCO LED
-#define INT_BV_LED 30 // Internal Bavard LED
-//#define MUX1_UART_LED 31 // 1st UART selector LED
-//#define MUX2_UART_LED 10 // 2st UART selector LED
 #define INT_STCO_LED 29 // Internal STARTCO LED
+#define INT_BV_LED 30 // Internal Bavard LED
+#define MUX1_UART_LED 31 // 1st UART selector LED
+#define MUX2_UART_LED 10 // 2st UART selector LED
+//#define INT_STCO_LED 29 // Internal STARTCO LED
 //#define INT_BV_LED 18 // Internal Bavard LED
-#define MUX1_UART_LED 19 // 1st UART selector LED
-#define MUX2_UART_LED 17 // 2st UART selector LED
+//#define MUX1_UART_LED 19 // 1st UART selector LED
+//#define MUX2_UART_LED 17 // 2st UART selector LED
 
-#define LOW_BAT_LED 15 // 2st UART selector LED
+//#define LOW_BAT_LED 15 // 2st UART selector LED
+#define LOW_BAT_LED 19 // 2st UART selector LED
 
 //UART Default Pin Definition
 #define UART_RX_PIN_NUMBER 5 // ProgBoard's ANNA UART Rx

@@ -12,6 +12,7 @@
 
 #include "app_peripherals.h"
 #include "app_settings.h"
+#include "app_saadc.h"
 #include "app_ppi.h"
 
 #define RTC_FREQUENCY_HZ 100 // give a period of 1 sec to RTC
@@ -20,7 +21,7 @@
 #define NB_MODE 4
 #define NB_UART_CONF 3
 
-#define V_BAT_TRHL 3.0
+#define V_BAT_TRHL 2000
 
 uint8_t mode = 0;
 uint8_t uart_conf = 0;
@@ -92,6 +93,9 @@ bool app_hdw_init(void)
   
   // Init RTC
   rtc_init();
+
+  // Init SAADC
+  app_saadc_init();
 
   // Init GPIOs
   gpio_init();
@@ -206,7 +210,7 @@ static void gpio_init(void)
   NRF_LOG_INFO("POWER_SENS");
   // Power SENS (À VÉRIFIER)
   nrf_gpio_cfg(TAG_PWR_SENS, NRF_GPIO_PIN_DIR_INPUT, NRF_GPIO_PIN_INPUT_DISCONNECT, NRF_GPIO_PIN_NOPULL, NRF_GPIO_PIN_S0D1, NRF_GPIO_PIN_NOSENSE);
-  nrf_gpio_cfg(V_BAT_SENS, NRF_GPIO_PIN_DIR_INPUT, NRF_GPIO_PIN_INPUT_DISCONNECT, NRF_GPIO_PIN_NOPULL, NRF_GPIO_PIN_S0D1, NRF_GPIO_PIN_NOSENSE);
+  //nrf_gpio_cfg(V_BAT_SENS, NRF_GPIO_PIN_DIR_INPUT, NRF_GPIO_PIN_INPUT_DISCONNECT, NRF_GPIO_PIN_NOPULL, NRF_GPIO_PIN_S0D1, NRF_GPIO_PIN_NOSENSE);
  
   NRF_LOG_INFO("STCO_PINS");
   // STARTCO SENS (À VÉRIFIER)
@@ -466,7 +470,9 @@ void app_hdw_read_UART_BTN()
 
 void app_hdw_read_V_BAT()
 {
-  uint8_t voltage = nrf_gpio_pin_read(V_BAT_SENS);
+  nrf_saadc_value_t voltage;
+  app_saadc_get_channel(0, &voltage);
+  NRF_LOG_INFO("VOLTAGE RAW: %d", voltage);
   if (voltage < V_BAT_TRHL){
     app_hdw_set_low_bat_led(true);
   }
