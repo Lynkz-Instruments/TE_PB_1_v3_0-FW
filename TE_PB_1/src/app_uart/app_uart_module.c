@@ -23,9 +23,7 @@
 
 #define UART_RX_BUF_SIZE 512  // UART RX buffer size.
 
-static nrfx_uarte_t uarte = NRFX_UARTE_INSTANCE(0); // Instance unique UARTE
 static uint8_t rx_buffer[UART_RX_BUF_SIZE];
-static uint8_t tx_buffer[UART_RX_BUF_SIZE];
 static uint32_t rx_counter = 0;
 static bool tx_ready = false;
 
@@ -67,6 +65,27 @@ void app_uart_module_event_handler(app_uart_evt_t * p_event)
   }
 }
 
+ret_code_t app_uart_init_PB(void)
+{
+  uint32_t err_code;
+  const app_uart_comm_params_t comm_params =
+  {
+    UART_RX_PIN_NUMBER,
+    UART_TX_PIN_NUMBER,
+    SERIAL_RTS_PIN,
+    SERIAL_CTS_PIN,
+    APP_UART_FLOW_CONTROL_DISABLED,
+    false,
+    NRF_UART_BAUDRATE_115200
+  };
+
+  err_code = app_uart_init(&comm_params, NULL,  app_uart_module_event_handler, APP_IRQ_PRIORITY_LOWEST);
+
+  APP_ERROR_CHECK(err_code);
+  return err_code;
+}
+
+
 ret_code_t app_uart_module_write(const uint8_t * p_data, const uint32_t size, uint32_t timeout_ms)
 {
   ret_code_t err_code;
@@ -95,27 +114,4 @@ ret_code_t app_uart_module_flush(uint32_t timeout_ms)
 ret_code_t app_uart_module_uninit(void)
 {
   return (ret_code_t)app_uart_close();
-}
-
-// Fonction pour configurer les pins de l'UART
-void uart_configure_pins(uint32_t rx_pin, uint32_t tx_pin) {
-    //nrfx_uarte_uninit(&uarte); // Désinitialisation
-    nrfx_uarte_config_t config = NRFX_UARTE_DEFAULT_CONFIG;
-    config.pselrxd = rx_pin;
-    config.pseltxd = tx_pin;
-    config.hwfc = NRF_UARTE_HWFC_DISABLED; // Pas de contrôle de flux
-    config.baudrate = 9600;
-    APP_ERROR_CHECK(nrfx_uarte_init(&uarte, &config, NULL));
-}
-
-// Fonction pour lire les données et transférer
-void uart_transfer(uint32_t src_rx_pin, uint32_t dst_tx_pin) {
-    uart_configure_pins(src_rx_pin, dst_tx_pin); // Configurer pour la source/destination
-    nrfx_uarte_rx(&uarte, rx_buffer, 1);        // Lire un octet (bloquant dans cet exemple)
-    nrfx_uarte_tx(&uarte, rx_buffer, 1);        // Envoyer cet octet
-}
-
-void uart_send_byte(char byte[]) {
-    // Envoi d'un byte
-    APP_ERROR_CHECK(nrfx_uarte_tx(&uarte, &byte, 16));
 }

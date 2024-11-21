@@ -12,6 +12,7 @@
 
 #include "app_peripherals.h"
 #include "app_settings.h"
+#include "app_ppi.h"
 
 #define RTC_FREQUENCY_HZ 100 // give a period of 1 sec to RTC
 #define RTC_PRESACLER (32768 / RTC_FREQUENCY_HZ) - 1
@@ -226,12 +227,18 @@ static void gpio_init(void)
   nrf_gpio_cfg(TAG_PWR, NRF_GPIO_PIN_DIR_OUTPUT, NRF_GPIO_PIN_INPUT_DISCONNECT, NRF_GPIO_PIN_NOPULL, NRF_GPIO_PIN_S0D1, NRF_GPIO_PIN_NOSENSE);
 
   // UART config
+    //nrf_drv_gpiote_in_config_t in_config = GPIOTE_CONFIG_IN_SENSE_TOGGLE(false); // Sensibilité au changement d'état
+    //in_config.pull = NRF_GPIO_PIN_NOPULL;
+    //nrf_drv_gpiote_in_init(UART_RX_PIN_NUMBER, &in_config, NULL);
+    //nrf_drv_gpiote_in_init(TAG_RX_PIN_NUMBER, &in_config, NULL);
+    //nrf_drv_gpiote_in_init(BV_TX_PIN_NUMBER, &in_config, NULL);
 
+    //nrf_drv_gpiote_out_config_t out_config = GPIOTE_CONFIG_OUT_TASK_TOGGLE(true);
+    //nrf_drv_gpiote_out_init(UART_TX_PIN_NUMBER, &out_config);
+    //nrf_drv_gpiote_out_init(TAG_TX_PIN_NUMBER, &out_config);
 
-  app_hdw_set_INT_STCO_led(false);
-  app_hdw_set_INT_BV_led(false);
-  app_hdw_set_UART1_led(false);
-  app_hdw_set_UART2_led(false);
+  app_hdw_select_UART();
+  app_hdw_select_mode();
 }
 
 void app_hdw_select_mode()
@@ -293,19 +300,40 @@ void app_hdw_select_mode()
 
 void app_hdw_select_UART()
 {
+
+  ret_code_t err_code;
   switch (uart_conf)
-  {
+  { 
   case 0:
     app_hdw_set_UART1_led(false);
     app_hdw_set_UART2_led(false);
-    break;
+    free_ppi_channel(0, BV_TX_PIN_NUMBER, UART_TX_PIN_NUMBER);
+
+     
+    err_code = app_uart_init_PB();
+    APP_ERROR_CHECK(err_code);
+    NRF_LOG_INFO("UART_INITIALIZED");
+
+  break;
+
   case 1:
     app_hdw_set_UART1_led(true);
     app_hdw_set_UART2_led(false);
-    break;
+
+    err_code = app_uart_module_uninit();
+    APP_ERROR_CHECK(err_code);
+    configure_ppi_channel(0, UART_RX_PIN_NUMBER, TAG_TX_PIN_NUMBER);
+    configure_ppi_channel(1, TAG_RX_PIN_NUMBER, UART_TX_PIN_NUMBER);
+
+  break;
+
   case 2:
     app_hdw_set_UART1_led(false);
     app_hdw_set_UART2_led(true);
+    free_ppi_channel(0, UART_RX_PIN_NUMBER, TAG_TX_PIN_NUMBER);
+    free_ppi_channel(1, TAG_RX_PIN_NUMBER, UART_TX_PIN_NUMBER);
+    configure_ppi_channel(0, BV_TX_PIN_NUMBER, UART_TX_PIN_NUMBER);
+
     break;
 
   
