@@ -303,7 +303,6 @@ void app_hdw_select_UART()
      
     err_code = app_uart_init_PB();
     APP_ERROR_CHECK(err_code);
-    NRF_LOG_INFO("UART_INITIALIZED");
 
   break;
 
