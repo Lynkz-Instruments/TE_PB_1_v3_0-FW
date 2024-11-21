@@ -14,6 +14,7 @@
 #include "app_settings.h"
 #include "app_saadc.h"
 #include "app_ppi.h"
+#include "app_uart_module.h"
 
 #define RTC_FREQUENCY_HZ 100 // give a period of 1 sec to RTC
 #define RTC_PRESACLER (32768 / RTC_FREQUENCY_HZ) - 1
