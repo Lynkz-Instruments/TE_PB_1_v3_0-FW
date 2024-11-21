@@ -231,7 +231,7 @@ static void gpio_init(void)
     //in_config.pull = NRF_GPIO_PIN_NOPULL;
     //nrf_drv_gpiote_in_init(UART_RX_PIN_NUMBER, &in_config, NULL);
     //nrf_drv_gpiote_in_init(TAG_RX_PIN_NUMBER, &in_config, NULL);
-    //nrf_drv_gpiote_in_init(BV_TX_PIN_NUMBER, &in_config, NULL);
+    //nrf_drv_gpiote_in_init(BV_RX_PIN_NUMBER, &in_config, NULL);
 
     //nrf_drv_gpiote_out_config_t out_config = GPIOTE_CONFIG_OUT_TASK_TOGGLE(true);
     //nrf_drv_gpiote_out_init(UART_TX_PIN_NUMBER, &out_config);
@@ -307,7 +307,7 @@ void app_hdw_select_UART()
   case 0:
     app_hdw_set_UART1_led(false);
     app_hdw_set_UART2_led(false);
-    app_ppi_free_channel(0, BV_TX_PIN_NUMBER, UART_TX_PIN_NUMBER);
+    app_ppi_free_channel(0, BV_RX_PIN_NUMBER, UART_TX_PIN_NUMBER);
 
      
     err_code = app_uart_init_PB();
@@ -332,7 +332,7 @@ void app_hdw_select_UART()
     app_hdw_set_UART2_led(true);
     app_ppi_free_channel(0, UART_RX_PIN_NUMBER, TAG_TX_PIN_NUMBER);
     app_ppi_free_channel(1, TAG_RX_PIN_NUMBER, UART_TX_PIN_NUMBER);
-    app_ppi_configure_channel(0, BV_TX_PIN_NUMBER, UART_TX_PIN_NUMBER);
+    app_ppi_configure_channel(0, BV_RX_PIN_NUMBER, UART_TX_PIN_NUMBER);
 
     break;
 
