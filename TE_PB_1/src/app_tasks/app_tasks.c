@@ -15,6 +15,8 @@
 #include "app_communication.h"
 #include "app_saadc.h"
 #include "app.h"
+#include "app_hardware.h"
+
 
 // Task specific defines
 #define TASK_ADVERTISE_PERIOD          5     // sec
@@ -152,6 +154,9 @@ void setup_tasks(void)
 
   // Get Data and Send it through LoRaWAN
   SCH_Add_Task(task_send_data, 0, SEC_TO_TICK(app_settings_get_record_period_minutes() * 60), false);
+
+  SCH_Add_Task(app_hdw_read_V_BAT, 0, SEC_TO_TICK(2), false);
+
 
 }
 
