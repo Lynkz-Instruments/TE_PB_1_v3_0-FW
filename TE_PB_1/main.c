@@ -18,6 +18,7 @@
 #include "app_tasks.h"
 #include "app_uart_module.h"
 #include "app_ppi.h"
+#include "app_saadc.h"
 
 // 0 -> No log
 // 1 -> Error only
@@ -100,5 +101,8 @@ int main(void)
 
     /* Call SoftDevice Wait For event */
     sd_app_evt_wait();
+
+    app_hdw_read_V_BAT();
+    nrf_delay_ms(100);
   }
 }
