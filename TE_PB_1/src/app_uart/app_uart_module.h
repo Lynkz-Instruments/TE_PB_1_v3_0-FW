@@ -15,6 +15,10 @@
 #include <stdint.h>
 #include "sdk_errors.h"
 
+/**
+ * @brief Function to initialize UART communication between the Anna module and the USB interface.
+ * 
+ */
 ret_code_t app_uart_init_PB(void);
 
 /**
