@@ -300,27 +300,40 @@ void app_hdw_select_mode()
 
 void app_hdw_select_UART()
 {
+
+  ret_code_t err_code;
   switch (uart_conf)
-  {
+  { 
   case 0:
     app_hdw_set_UART1_led(false);
     app_hdw_set_UART2_led(false);
-    free_ppi_channel(0, BV_TX_PIN_NUMBER, UART_TX_PIN_NUMBER);    
-    app_uart_init_PB();
+    free_ppi_channel(0, BV_TX_PIN_NUMBER, UART_TX_PIN_NUMBER);
+
+     
+    err_code = app_uart_init_PB();
+    APP_ERROR_CHECK(err_code);
+    NRF_LOG_INFO("UART_INITIALIZED");
+
   break;
+
   case 1:
     app_hdw_set_UART1_led(true);
     app_hdw_set_UART2_led(false);
+
+    err_code = app_uart_module_uninit();
+    APP_ERROR_CHECK(err_code);
     configure_ppi_channel(0, UART_RX_PIN_NUMBER, TAG_TX_PIN_NUMBER);
     configure_ppi_channel(1, TAG_RX_PIN_NUMBER, UART_TX_PIN_NUMBER);
-    app_uart_module_uninit();
-    break;
+
+  break;
+
   case 2:
     app_hdw_set_UART1_led(false);
     app_hdw_set_UART2_led(true);
     free_ppi_channel(0, UART_RX_PIN_NUMBER, TAG_TX_PIN_NUMBER);
     free_ppi_channel(1, TAG_RX_PIN_NUMBER, UART_TX_PIN_NUMBER);
     configure_ppi_channel(0, BV_TX_PIN_NUMBER, UART_TX_PIN_NUMBER);
+
     break;
 
   
