@@ -18,13 +18,8 @@ extern "C" {
 #define INT_BV_LED 30 // Internal Bavard LED
 #define MUX1_UART_LED 31 // 1st UART selector LED
 #define MUX2_UART_LED 10 // 2st UART selector LED
-//#define INT_STCO_LED 29 // Internal STARTCO LED
-//#define INT_BV_LED 18 // Internal Bavard LED
-//#define MUX1_UART_LED 19 // 1st UART selector LED
-//#define MUX2_UART_LED 17 // 2st UART selector LED
 
-//#define LOW_BAT_LED 15 // 2st UART selector LED
-#define LOW_BAT_LED 19 // 2st UART selector LED
+#define LOW_BAT_LED 15 // 2st UART selector LED
 
 //UART Default Pin Definition
 #define UART_RX_PIN_NUMBER 5 // ProgBoard's ANNA UART Rx
@@ -32,11 +27,6 @@ extern "C" {
 #define TAG_RX_PIN_NUMBER 18 // TAG's ANNA UART Rx
 #define TAG_TX_PIN_NUMBER 16 // TAG's ANNA UART Tx
 #define BV_RX_PIN_NUMBER 14 // Bavard's UART Tx
-
-//#define UART_RX_PIN_NUMBER 18 // ProgBoard's ANNA UART Rx
-//#define UART_TX_PIN_NUMBER 16 // ProgBoard's ANNA UART Tx
-//#define TAG_RX_PIN_NUMBER 16 // TAG's ANNA UART Rx
-//#define TAG_TX_PIN_NUMBER 17 // TAG's ANNA UART Tx
 
 
 #define SERIAL_RTS_PIN 0xFF
@@ -55,10 +45,8 @@ extern "C" {
 #define STCO_SHORT_Z_PIN 24 // HIGH if GND Check says SHORT CIRCUIT
 
 //Buttons Default Pin Definition
-#define UART_SELECTOR_BTN 13 // Selector to chose which device communicate with UART through USB
-//#define UART_SELECTOR_BTN 19 // Selector to chose which device communicate with UART through USB
-#define MODE_SELECTOR_BTN 12 // Selector to change the configuration (INTERNAL/EXTERNAL STCO/Bavard)
-//#define MODE_SELECTOR_BTN 11 // Selector to change the configuration (INTERNAL/EXTERNAL STCO/Bavard)
+#define UART_SELECTOR_BTN 19 // Selector to chose which device communicate with UART through USB
+#define MODE_SELECTOR_BTN 11 // Selector to change the configuration (INTERNAL/EXTERNAL STCO/Bavard)
 
 //TAG Power Default Pin Definition
 #define TAG_PWR 28 // Can power the TAG through this pin

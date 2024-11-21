@@ -26,7 +26,7 @@
 
 uint8_t mode = 0;
 uint8_t uart_conf = 0;
-bool uart_ble = true;
+bool uart_ble = false;
 
 static bool interrupt_initialized = false;
 

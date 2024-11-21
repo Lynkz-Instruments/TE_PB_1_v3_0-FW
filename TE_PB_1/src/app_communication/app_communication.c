@@ -50,6 +50,7 @@
 #define RESTART_COMMAND           0x72
 
 #define ENABLE_UART_BLE           0x62
+#define DISABLE_UART_BLE          0x64
 
 #define OK_RESPONSE               0xE0
 #define DONE_RESPONSE             0xE1
@@ -160,6 +161,9 @@ void app_comm_process(uint8_t const* data, uint16_t len)
         break;
       case ENABLE_UART_BLE:
         app_hdw_set_uart_ble(true);
+        break;
+        case DISABLE_UART_BLE:
+        app_hdw_set_uart_ble(false);
         break;
       default:
         #if APP_COMMUNICATION_VERBOSE >= 1
