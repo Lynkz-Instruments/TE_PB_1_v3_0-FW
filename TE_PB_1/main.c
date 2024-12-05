@@ -36,7 +36,7 @@
 
 
 int main(void)
-{
+ {
   // TODO: Remove before deployment
   //app_uicr_set(UICR_DEVICE_STATE_ID, 1);
   //app_uicr_set(UICR_PANEL_NO_LSB_ID, (uint32_t) 0x00000002);

@@ -135,13 +135,13 @@ void app_hdw_set_TAG_pwr(bool on);
  * @brief Function to read the mode button and change the mode value.
  * 
  */
-void app_hdw_read_mode_BTN();
+void app_hdw_read_mode_BTN(nrfx_gpiote_pin_t pin, nrf_gpiote_polarity_t action);
 
 /**
  * @brief Function to read the UART button and change the UART device.
  * 
  */
-void app_hdw_read_UART_BTN();
+void app_hdw_read_UART_BTN(nrfx_gpiote_pin_t pin, nrf_gpiote_polarity_t action);
 
 /**
  * @brief Function to indicate the battery's state.
