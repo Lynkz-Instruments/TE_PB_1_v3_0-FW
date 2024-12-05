@@ -79,6 +79,9 @@ void mode_button_interrupt_init(void);
 void app_hdw_set_UART1_led(bool on);
 void app_hdw_set_UART2_led(bool on);
 
+void app_hdw_select_UART();
+void app_hdw_select_mode();
+
 bool app_hdw_init(void)
 {
   // Init logging system.
@@ -104,14 +107,15 @@ bool app_hdw_init(void)
   // Init GPIOs
   gpio_init();
 
-  // Initial condition
-  mode = 0;
-  uart_conf = 0;
-  app_hdw_select_UART();
-  app_hdw_select_mode();
+
 
   buttons_interrupt_init();
 
+  // Initial condition
+  mode = 2;
+  uart_conf = 1;
+  app_hdw_select_UART();
+  app_hdw_select_mode();
   return true;
 }
 
@@ -213,14 +217,14 @@ static void gpio_init(void)
 
   NRF_LOG_INFO("POWER_SENS");
   // Power SENS (À VÉRIFIER)
-  nrf_gpio_cfg(TAG_PWR_SENS, NRF_GPIO_PIN_DIR_INPUT, NRF_GPIO_PIN_INPUT_DISCONNECT, NRF_GPIO_PIN_NOPULL, NRF_GPIO_PIN_S0D1, NRF_GPIO_PIN_NOSENSE);
+  nrf_gpio_cfg(TAG_PWR_SENS, NRF_GPIO_PIN_DIR_INPUT, NRF_GPIO_PIN_INPUT_CONNECT, NRF_GPIO_PIN_NOPULL, NRF_GPIO_PIN_S0S1, NRF_GPIO_PIN_NOSENSE);
   //nrf_gpio_cfg(V_BAT_SENS, NRF_GPIO_PIN_DIR_INPUT, NRF_GPIO_PIN_INPUT_DISCONNECT, NRF_GPIO_PIN_NOPULL, NRF_GPIO_PIN_S0D1, NRF_GPIO_PIN_NOSENSE);
  
   NRF_LOG_INFO("STCO_PINS");
   // STARTCO SENS (À VÉRIFIER)
-  nrf_gpio_cfg(STCO_OK_PIN, NRF_GPIO_PIN_DIR_INPUT, NRF_GPIO_PIN_INPUT_DISCONNECT, NRF_GPIO_PIN_NOPULL, NRF_GPIO_PIN_S0D1, NRF_GPIO_PIN_NOSENSE);
-  nrf_gpio_cfg(STCO_OPEN_Z_PIN, NRF_GPIO_PIN_DIR_INPUT, NRF_GPIO_PIN_INPUT_DISCONNECT, NRF_GPIO_PIN_NOPULL, NRF_GPIO_PIN_S0D1, NRF_GPIO_PIN_NOSENSE);
-  nrf_gpio_cfg(STCO_SHORT_Z_PIN, NRF_GPIO_PIN_DIR_INPUT, NRF_GPIO_PIN_INPUT_DISCONNECT, NRF_GPIO_PIN_NOPULL, NRF_GPIO_PIN_S0D1, NRF_GPIO_PIN_NOSENSE);
+  nrf_gpio_cfg(STCO_OK_PIN, NRF_GPIO_PIN_DIR_INPUT, NRF_GPIO_PIN_INPUT_CONNECT, NRF_GPIO_PIN_NOPULL, NRF_GPIO_PIN_S0S1, NRF_GPIO_PIN_NOSENSE);
+  nrf_gpio_cfg(STCO_OPEN_Z_PIN, NRF_GPIO_PIN_DIR_INPUT, NRF_GPIO_PIN_INPUT_CONNECT, NRF_GPIO_PIN_NOPULL, NRF_GPIO_PIN_S0S1, NRF_GPIO_PIN_NOSENSE);
+  nrf_gpio_cfg(STCO_SHORT_Z_PIN, NRF_GPIO_PIN_DIR_INPUT, NRF_GPIO_PIN_INPUT_CONNECT, NRF_GPIO_PIN_NOPULL, NRF_GPIO_PIN_S0S1, NRF_GPIO_PIN_NOSENSE);
 
   NRF_LOG_INFO("SWITCHES_PINS");
   // Analog Switches 
@@ -493,7 +497,7 @@ void app_hdw_set_low_bat_led(bool on)
 
 void app_hdw_set_TAG_pwr(bool on)
 {
-  if (!on){
+  if (on){
     nrf_gpio_pin_clear(TAG_PWR);
   }
   else{
@@ -509,7 +513,7 @@ void app_hdw_read_mode_BTN(nrfx_gpiote_pin_t pin, nrf_gpiote_polarity_t action)
     mode = 0;
   }
   app_hdw_select_mode();
-  nrf_delay_ms(300); //Si pas de debounce
+  //nrf_delay_ms(300); //Si pas de debounce
 }
 
 void app_hdw_read_UART_BTN(nrfx_gpiote_pin_t pin, nrf_gpiote_polarity_t action)
@@ -519,7 +523,7 @@ void app_hdw_read_UART_BTN(nrfx_gpiote_pin_t pin, nrf_gpiote_polarity_t action)
     uart_conf = 0;
   }
   app_hdw_select_UART();
-  nrf_delay_ms(300); //Si pas de debounce
+  //nrf_delay_ms(300); //Si pas de debounce
 
 }
 
@@ -547,25 +551,29 @@ void app_hdw_read_V_BAT()
 
 void app_hdw_detect_TAG()
 {
+
   if (app_hdw_read_STCO() == STCO_OK){
 
+    nrf_delay_ms(100);
     if (!(bool)nrf_gpio_pin_read(TAG_PWR_SENS)){
       app_hdw_set_TAG_pwr(true);
       NRF_LOG_INFO("TAG NOT POWERED");
     }
     else {
-      app_hdw_set_TAG_pwr(false);
+      //app_hdw_set_TAG_pwr(false);
       NRF_LOG_INFO("TAG POWERED");
     }
-
+  NRF_LOG_INFO("TAG Detected");
   }
-  NRF_LOG_INFO("TAG Detection");
+  else {
+    app_hdw_set_TAG_pwr(false);
+  }
 
 }
 
 STARTCO_t app_hdw_read_STCO() {
   STARTCO_t STCO_state = STCO_ERROR;
-  if ((bool)nrf_gpio_pin_read(STCO_OK_PIN)){
+  if (nrf_gpio_pin_read(STCO_OK_PIN)){
     STCO_state = STCO_OK;
   }
   else if ((bool)nrf_gpio_pin_read(STCO_OPEN_Z_PIN)) {
