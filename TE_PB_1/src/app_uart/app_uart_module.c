@@ -17,6 +17,7 @@
 #include "nrf_log.h"
 #include "nrf_delay.h"
 #include "nrfx_uarte.h"
+#include "app_communication.h"
 
 #include "custom_board.h"
 #include "app.h"
@@ -29,6 +30,7 @@ static bool tx_ready = false;
 
 void uart_event_handler_1(nrfx_uarte_event_t const *p_event, void *p_context);
 void uart_event_handler_2(nrfx_uarte_event_t const *p_event, void *p_context);
+void send_byte(const char c);
 
 void(*app_uart_module_rx_handler)(const char c) = NULL;
 
@@ -48,13 +50,13 @@ void app_uart_module_event_handler(app_uart_evt_t * p_event)
       break;
     case APP_UART_DATA:
       if(app_uart_get((uint8_t *)&ch) == NRF_SUCCESS){
-        if(app_uart_module_rx_handler){
-          // Send the character to the rx handler.
-          app_uart_module_rx_handler(ch);
-          // Add to the buffer too.
-          rx_buffer[rx_counter] = (uint8_t)ch;
-          rx_counter++;
-        }
+
+        // Send the character to the rx handler.
+        send_byte(ch);
+        // Add to the buffer too.
+        rx_buffer[rx_counter] = (uint8_t)ch;
+        rx_counter++;
+
       }
       break;
     case APP_UART_DATA_READY:
@@ -83,8 +85,51 @@ ret_code_t app_uart_init_PB(void)
 
   APP_ERROR_CHECK(err_code);
   return err_code;
+  
+app_uart_module_set_rx_callback(send_byte);
 }
 
+ret_code_t app_uart_init_TAG(void)
+{
+  uint32_t err_code;
+  const app_uart_comm_params_t comm_params =
+  {
+    TAG_RX_PIN_NUMBER,
+    TAG_TX_PIN_NUMBER,
+    SERIAL_RTS_PIN,
+    SERIAL_CTS_PIN,
+    APP_UART_FLOW_CONTROL_DISABLED,
+    false,
+    NRF_UART_BAUDRATE_115200
+  };
+
+  err_code = app_uart_init(&comm_params, NULL,  app_uart_module_event_handler, APP_IRQ_PRIORITY_LOWEST);
+
+  APP_ERROR_CHECK(err_code);
+  return err_code;
+  
+app_uart_module_set_rx_callback(send_byte);
+}
+
+ret_code_t app_uart_init_BV(void)
+{
+  uint32_t err_code;
+  const app_uart_comm_params_t comm_params =
+  {
+    BV_RX_PIN_NUMBER,
+    TAG_TX_PIN_NUMBER,
+    SERIAL_RTS_PIN,
+    SERIAL_CTS_PIN,
+    APP_UART_FLOW_CONTROL_DISABLED,
+    false,
+    NRF_UART_BAUDRATE_115200
+  };
+
+  err_code = app_uart_init(&comm_params, NULL,  app_uart_module_event_handler, APP_IRQ_PRIORITY_LOWEST);
+
+  APP_ERROR_CHECK(err_code);
+  return err_code;
+}
 
 ret_code_t app_uart_module_write(const uint8_t * p_data, const uint32_t size, uint32_t timeout_ms)
 {
@@ -114,4 +159,9 @@ ret_code_t app_uart_module_flush(uint32_t timeout_ms)
 ret_code_t app_uart_module_uninit(void)
 {
   return (ret_code_t)app_uart_close();
+}
+
+void send_byte(const char c) {
+    app_comm_send_packet(&c, sizeof(uint8_t));
+    NRF_LOG_INFO("SENDING : %c", c);
 }

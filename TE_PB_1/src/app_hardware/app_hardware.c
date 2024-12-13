@@ -26,6 +26,8 @@
 
 uint8_t mode = 0;
 uint8_t uart_conf = 0;
+bool uart_ble = false;
+bool first_UART_CONF = true;
 
 static bool interrupt_initialized = false;
 
@@ -75,13 +77,19 @@ void buttons_interrupt_init(void);
 void UART_button_interrupt_init(void);
 
 void mode_button_interrupt_init(void);
+void app_hdw_set_UART1_led(bool on);
+void app_hdw_set_UART2_led(bool on);
+
+void app_hdw_select_UART();
+void app_hdw_select_mode();
 
 bool app_hdw_init(void)
 {
   // Init logging system.
   log_init();
 
-  NRF_LOG_INFO("SMARTLINERS MAINBOARD FW %s STARTED!", FW_VERSION);
+  NRF_LOG_INFO("PROGBOARD FW %s STARTED!", FW_VERSION);
+  nrf_delay_ms(100);
 
   // Get the reset reason
   NRF5_UTILS_GetResetReasons();
@@ -101,14 +109,15 @@ bool app_hdw_init(void)
   // Init GPIOs
   gpio_init();
 
-  // Initial condition
-  mode = 0;
-  uart_conf = 0;
-  app_hdw_select_UART();
-  app_hdw_select_mode();
+
 
   buttons_interrupt_init();
 
+  // Initial condition
+  mode = 2;
+  uart_conf = 0;
+  app_hdw_select_UART();
+  app_hdw_select_mode();
   return true;
 }
 
@@ -202,39 +211,41 @@ static void gpio_init(void)
 {
   NRF_LOG_INFO("LED_PINS");
   // LEDs
-  nrf_gpio_cfg(INT_STCO_LED, NRF_GPIO_PIN_DIR_OUTPUT, NRF_GPIO_PIN_INPUT_DISCONNECT, NRF_GPIO_PIN_NOPULL, NRF_GPIO_PIN_S0D1, NRF_GPIO_PIN_NOSENSE);
-  nrf_gpio_cfg(INT_BV_LED, NRF_GPIO_PIN_DIR_OUTPUT, NRF_GPIO_PIN_INPUT_DISCONNECT, NRF_GPIO_PIN_NOPULL, NRF_GPIO_PIN_S0D1, NRF_GPIO_PIN_NOSENSE);
-  nrf_gpio_cfg(MUX1_UART_LED, NRF_GPIO_PIN_DIR_OUTPUT, NRF_GPIO_PIN_INPUT_DISCONNECT, NRF_GPIO_PIN_NOPULL, NRF_GPIO_PIN_S0D1, NRF_GPIO_PIN_NOSENSE);
-  nrf_gpio_cfg(MUX2_UART_LED, NRF_GPIO_PIN_DIR_OUTPUT, NRF_GPIO_PIN_INPUT_DISCONNECT, NRF_GPIO_PIN_NOPULL, NRF_GPIO_PIN_S0D1, NRF_GPIO_PIN_NOSENSE);
-  nrf_gpio_cfg(LOW_BAT_LED, NRF_GPIO_PIN_DIR_OUTPUT, NRF_GPIO_PIN_INPUT_DISCONNECT, NRF_GPIO_PIN_NOPULL, NRF_GPIO_PIN_S0D1, NRF_GPIO_PIN_NOSENSE);
+  nrf_gpio_cfg(INT_STCO_LED, NRF_GPIO_PIN_DIR_OUTPUT, NRF_GPIO_PIN_INPUT_DISCONNECT, NRF_GPIO_PIN_NOPULL, NRF_GPIO_PIN_S0S1, NRF_GPIO_PIN_NOSENSE);
+  nrf_gpio_cfg(INT_BV_LED, NRF_GPIO_PIN_DIR_OUTPUT, NRF_GPIO_PIN_INPUT_DISCONNECT, NRF_GPIO_PIN_NOPULL, NRF_GPIO_PIN_S0S1, NRF_GPIO_PIN_NOSENSE);
+  nrf_gpio_cfg(MUX1_UART_LED, NRF_GPIO_PIN_DIR_OUTPUT, NRF_GPIO_PIN_INPUT_DISCONNECT, NRF_GPIO_PIN_NOPULL, NRF_GPIO_PIN_S0S1, NRF_GPIO_PIN_NOSENSE);
+  nrf_gpio_cfg(MUX2_UART_LED, NRF_GPIO_PIN_DIR_OUTPUT, NRF_GPIO_PIN_INPUT_DISCONNECT, NRF_GPIO_PIN_NOPULL, NRF_GPIO_PIN_S0S1, NRF_GPIO_PIN_NOSENSE);
+  nrf_gpio_cfg(LOW_BAT_LED, NRF_GPIO_PIN_DIR_OUTPUT, NRF_GPIO_PIN_INPUT_DISCONNECT, NRF_GPIO_PIN_NOPULL, NRF_GPIO_PIN_S0S1, NRF_GPIO_PIN_NOSENSE);
 
   NRF_LOG_INFO("POWER_SENS");
   // Power SENS (À VÉRIFIER)
-  nrf_gpio_cfg(TAG_PWR_SENS, NRF_GPIO_PIN_DIR_INPUT, NRF_GPIO_PIN_INPUT_DISCONNECT, NRF_GPIO_PIN_NOPULL, NRF_GPIO_PIN_S0D1, NRF_GPIO_PIN_NOSENSE);
+  nrf_gpio_cfg(TAG_PWR_SENS, NRF_GPIO_PIN_DIR_INPUT, NRF_GPIO_PIN_INPUT_CONNECT, NRF_GPIO_PIN_NOPULL, NRF_GPIO_PIN_S0S1, NRF_GPIO_PIN_NOSENSE);
   //nrf_gpio_cfg(V_BAT_SENS, NRF_GPIO_PIN_DIR_INPUT, NRF_GPIO_PIN_INPUT_DISCONNECT, NRF_GPIO_PIN_NOPULL, NRF_GPIO_PIN_S0D1, NRF_GPIO_PIN_NOSENSE);
  
   NRF_LOG_INFO("STCO_PINS");
   // STARTCO SENS (À VÉRIFIER)
-  nrf_gpio_cfg(STCO_OK_PIN, NRF_GPIO_PIN_DIR_INPUT, NRF_GPIO_PIN_INPUT_DISCONNECT, NRF_GPIO_PIN_NOPULL, NRF_GPIO_PIN_S0D1, NRF_GPIO_PIN_NOSENSE);
-  nrf_gpio_cfg(STCO_OPEN_Z_PIN, NRF_GPIO_PIN_DIR_INPUT, NRF_GPIO_PIN_INPUT_DISCONNECT, NRF_GPIO_PIN_NOPULL, NRF_GPIO_PIN_S0D1, NRF_GPIO_PIN_NOSENSE);
-  nrf_gpio_cfg(STCO_SHORT_Z_PIN, NRF_GPIO_PIN_DIR_INPUT, NRF_GPIO_PIN_INPUT_DISCONNECT, NRF_GPIO_PIN_NOPULL, NRF_GPIO_PIN_S0D1, NRF_GPIO_PIN_NOSENSE);
+  nrf_gpio_cfg(STCO_OK_PIN, NRF_GPIO_PIN_DIR_INPUT, NRF_GPIO_PIN_INPUT_CONNECT, NRF_GPIO_PIN_NOPULL, NRF_GPIO_PIN_S0S1, NRF_GPIO_PIN_NOSENSE);
+  nrf_gpio_cfg(STCO_OPEN_Z_PIN, NRF_GPIO_PIN_DIR_INPUT, NRF_GPIO_PIN_INPUT_CONNECT, NRF_GPIO_PIN_NOPULL, NRF_GPIO_PIN_S0S1, NRF_GPIO_PIN_NOSENSE);
+  nrf_gpio_cfg(STCO_SHORT_Z_PIN, NRF_GPIO_PIN_DIR_INPUT, NRF_GPIO_PIN_INPUT_CONNECT, NRF_GPIO_PIN_NOPULL, NRF_GPIO_PIN_S0S1, NRF_GPIO_PIN_NOSENSE);
 
   NRF_LOG_INFO("SWITCHES_PINS");
   // Analog Switches 
-  nrf_gpio_cfg(SW1, NRF_GPIO_PIN_DIR_OUTPUT, NRF_GPIO_PIN_INPUT_DISCONNECT, NRF_GPIO_PIN_NOPULL, NRF_GPIO_PIN_S0D1, NRF_GPIO_PIN_NOSENSE);
-  nrf_gpio_cfg(SW2, NRF_GPIO_PIN_DIR_OUTPUT, NRF_GPIO_PIN_INPUT_DISCONNECT, NRF_GPIO_PIN_NOPULL, NRF_GPIO_PIN_S0D1, NRF_GPIO_PIN_NOSENSE);
-  nrf_gpio_cfg(SW3, NRF_GPIO_PIN_DIR_OUTPUT, NRF_GPIO_PIN_INPUT_DISCONNECT, NRF_GPIO_PIN_NOPULL, NRF_GPIO_PIN_S0D1, NRF_GPIO_PIN_NOSENSE);
-  nrf_gpio_cfg(SW4_5, NRF_GPIO_PIN_DIR_OUTPUT, NRF_GPIO_PIN_INPUT_DISCONNECT, NRF_GPIO_PIN_NOPULL, NRF_GPIO_PIN_S0D1, NRF_GPIO_PIN_NOSENSE);
-  nrf_gpio_cfg(SW6, NRF_GPIO_PIN_DIR_OUTPUT, NRF_GPIO_PIN_INPUT_DISCONNECT, NRF_GPIO_PIN_NOPULL, NRF_GPIO_PIN_S0D1, NRF_GPIO_PIN_NOSENSE);
+  nrf_gpio_cfg(SW1, NRF_GPIO_PIN_DIR_OUTPUT, NRF_GPIO_PIN_INPUT_DISCONNECT, NRF_GPIO_PIN_NOPULL, NRF_GPIO_PIN_S0S1, NRF_GPIO_PIN_NOSENSE);
+  nrf_gpio_cfg(SW2, NRF_GPIO_PIN_DIR_OUTPUT, NRF_GPIO_PIN_INPUT_DISCONNECT, NRF_GPIO_PIN_NOPULL, NRF_GPIO_PIN_S0S1, NRF_GPIO_PIN_NOSENSE);
+  nrf_gpio_cfg(SW3, NRF_GPIO_PIN_DIR_OUTPUT, NRF_GPIO_PIN_INPUT_DISCONNECT, NRF_GPIO_PIN_NOPULL, NRF_GPIO_PIN_S0S1, NRF_GPIO_PIN_NOSENSE);
+  nrf_gpio_cfg(SW4_5, NRF_GPIO_PIN_DIR_OUTPUT, NRF_GPIO_PIN_INPUT_DISCONNECT, NRF_GPIO_PIN_NOPULL, NRF_GPIO_PIN_S0S1, NRF_GPIO_PIN_NOSENSE);
+  nrf_gpio_cfg(SW6, NRF_GPIO_PIN_DIR_OUTPUT, NRF_GPIO_PIN_INPUT_DISCONNECT, NRF_GPIO_PIN_NOPULL, NRF_GPIO_PIN_S0S1, NRF_GPIO_PIN_NOSENSE);
+  nrf_gpio_cfg_input(21, NRF_GPIO_PIN_PULLUP);
 
   NRF_LOG_INFO("TAG_PIN");
   // TAG power
   nrf_gpio_cfg(TAG_PWR, NRF_GPIO_PIN_DIR_OUTPUT, NRF_GPIO_PIN_INPUT_DISCONNECT, NRF_GPIO_PIN_NOPULL, NRF_GPIO_PIN_S0D1, NRF_GPIO_PIN_NOSENSE);
-
+  app_hdw_set_TAG_pwr(false);
 }
 
 void app_hdw_select_mode()
 {
+  NRF_LOG_INFO("MODE : %d", mode);
   switch (mode)
   {
   case 0:
@@ -286,7 +297,6 @@ void app_hdw_select_mode()
     break;
   }
   
-  NRF_LOG_INFO("MODE : %d", mode);
 
 }
 
@@ -294,51 +304,110 @@ void app_hdw_select_UART()
 {
 
   ret_code_t err_code;
-  switch (uart_conf)
-  { 
-  case 0:
-    app_hdw_set_UART1_led(false);
-    app_hdw_set_UART2_led(false);
-    app_ppi_free_channel(0, BV_RX_PIN_NUMBER, UART_TX_PIN_NUMBER);
 
+  if (!uart_ble) {
+  
+    NRF_LOG_INFO("UART : %d", uart_conf);
+    switch (uart_conf)
+    { 
+    case 0:
+      app_hdw_set_UART1_led(false);
+      app_hdw_set_UART2_led(false);
+      if (!first_UART_CONF) {
+        app_ppi_free_channel(0, BV_RX_PIN_NUMBER, UART_TX_PIN_NUMBER);
+        NRF_LOG_INFO("---------------------------LUCAS");
+      }
+      else {
+        first_UART_CONF = false;
+      }
      
-    err_code = app_uart_init_PB();
-    APP_ERROR_CHECK(err_code);
-
-  break;
-
-  case 1:
-    app_hdw_set_UART1_led(true);
-    app_hdw_set_UART2_led(false);
-
-    err_code = app_uart_module_uninit();
-    APP_ERROR_CHECK(err_code);
-    app_ppi_configure_channel(0, UART_RX_PIN_NUMBER, TAG_TX_PIN_NUMBER);
-    app_ppi_configure_channel(1, TAG_RX_PIN_NUMBER, UART_TX_PIN_NUMBER);
-
-  break;
-
-  case 2:
-    app_hdw_set_UART1_led(false);
-    app_hdw_set_UART2_led(true);
-    app_ppi_free_channel(0, UART_RX_PIN_NUMBER, TAG_TX_PIN_NUMBER);
-    app_ppi_free_channel(1, TAG_RX_PIN_NUMBER, UART_TX_PIN_NUMBER);
-    app_ppi_configure_channel(0, BV_RX_PIN_NUMBER, UART_TX_PIN_NUMBER);
+      err_code = app_uart_init_PB();
+      APP_ERROR_CHECK(err_code);
 
     break;
 
-  
-  default:
+    case 1:
+      app_hdw_set_UART1_led(true);
+      app_hdw_set_UART2_led(false);
+
+      err_code = app_uart_module_uninit();
+      APP_ERROR_CHECK(err_code);
+      app_ppi_configure_channel(0, UART_RX_PIN_NUMBER, TAG_TX_PIN_NUMBER);
+      app_ppi_configure_channel(1, TAG_RX_PIN_NUMBER, UART_TX_PIN_NUMBER);
+
+    break;
+
+    case 2:
+      app_hdw_set_UART1_led(false);
+      app_hdw_set_UART2_led(true);
+
+      app_ppi_free_channel(0, UART_RX_PIN_NUMBER, TAG_TX_PIN_NUMBER);
+      app_ppi_free_channel(1, TAG_RX_PIN_NUMBER, UART_TX_PIN_NUMBER);
+      app_ppi_configure_channel(0, BV_RX_PIN_NUMBER, UART_TX_PIN_NUMBER);
+
       break;
+
+  
+    default:
+        break;
+    }
+
   }
-  NRF_LOG_INFO("UART : %d", uart_conf);
+  else {
+  
+    NRF_LOG_INFO("UART_BLE : %d", uart_conf);
+    switch (uart_conf)
+    { 
+    case 0:
+      app_hdw_set_UART1_led(false);
+      app_hdw_set_UART2_led(false);
+
+      err_code = app_uart_module_uninit();
+      APP_ERROR_CHECK(err_code);
+
+      err_code = app_uart_init_PB();
+      APP_ERROR_CHECK(err_code);
+
+    break;
+
+    case 1:
+      app_hdw_set_UART1_led(true);
+      app_hdw_set_UART2_led(false);
+
+      err_code = app_uart_module_uninit();
+      APP_ERROR_CHECK(err_code);
+
+      err_code = app_uart_init_TAG();
+      APP_ERROR_CHECK(err_code);
+
+    break;
+
+    case 2:
+      app_hdw_set_UART1_led(false);
+      app_hdw_set_UART2_led(true);
+
+      err_code = app_uart_module_uninit();
+      APP_ERROR_CHECK(err_code);
+
+      err_code = app_uart_init_BV();
+      APP_ERROR_CHECK(err_code);
+
+      break;
+
+  
+    default:
+        break;
+    }
+    
+  }
+
 
 
 }
 
 void app_hdw_set_analog_switch1(bool on)
 {
-  if (on){
+  if (!on){
     nrf_gpio_pin_clear(SW1);
   }
   else{
@@ -348,7 +417,7 @@ void app_hdw_set_analog_switch1(bool on)
 
 void app_hdw_set_analog_switch2(bool on)
 {
-  if (on){
+  if (!on){
     nrf_gpio_pin_clear(SW2);
   }
   else{
@@ -358,7 +427,7 @@ void app_hdw_set_analog_switch2(bool on)
 
 void app_hdw_set_analog_switch3(bool on)
 {
-  if (on){
+  if (!on){
     nrf_gpio_pin_clear(SW3);
   }
   else{
@@ -368,7 +437,7 @@ void app_hdw_set_analog_switch3(bool on)
 
 void app_hdw_set_analog_switch4_5(bool on)
 {
-  if (on){
+  if (!on){
     nrf_gpio_pin_clear(SW4_5);
   }
   else{
@@ -378,7 +447,7 @@ void app_hdw_set_analog_switch4_5(bool on)
 
 void app_hdw_set_analog_switch6(bool on)
 {
-  if (on){
+  if (!on){
     nrf_gpio_pin_clear(SW6);
   }
   else{
@@ -388,7 +457,7 @@ void app_hdw_set_analog_switch6(bool on)
 
 void app_hdw_set_INT_STCO_led(bool on)
 {
-  if (on){
+  if (!on){
     nrf_gpio_pin_clear(INT_STCO_LED);
   }
   else{
@@ -398,7 +467,7 @@ void app_hdw_set_INT_STCO_led(bool on)
 
 void app_hdw_set_INT_BV_led(bool on)
 {
-  if (on){
+  if (!on){
     nrf_gpio_pin_clear(INT_BV_LED);
   }
   else{
@@ -408,7 +477,7 @@ void app_hdw_set_INT_BV_led(bool on)
 
 void app_hdw_set_UART1_led(bool on)
 {
-  if (on){
+  if (!on){
     nrf_gpio_pin_clear(MUX1_UART_LED);
   }
   else{
@@ -418,7 +487,7 @@ void app_hdw_set_UART1_led(bool on)
 
 void app_hdw_set_UART2_led(bool on)
 {
-  if (on){
+  if (!on){
     nrf_gpio_pin_clear(MUX2_UART_LED);
   }
   else{
@@ -446,7 +515,7 @@ void app_hdw_set_TAG_pwr(bool on)
   }
 }
 
-void app_hdw_read_mode_BTN()
+void app_hdw_read_mode_BTN(nrfx_gpiote_pin_t pin, nrf_gpiote_polarity_t action)
 {
   mode++;
   if (mode > NB_MODE - 1)
@@ -454,17 +523,17 @@ void app_hdw_read_mode_BTN()
     mode = 0;
   }
   app_hdw_select_mode();
-  nrf_delay_ms(300); //Si pas de debounce
+  //nrf_delay_ms(300); //Si pas de debounce
 }
 
-void app_hdw_read_UART_BTN()
+void app_hdw_read_UART_BTN(nrfx_gpiote_pin_t pin, nrf_gpiote_polarity_t action)
 {
   uart_conf++;
   if (uart_conf > NB_UART_CONF - 1){
     uart_conf = 0;
   }
   app_hdw_select_UART();
-  nrf_delay_ms(300); //Si pas de debounce
+  //nrf_delay_ms(300); //Si pas de debounce
 
 }
 
@@ -481,7 +550,7 @@ void app_hdw_read_V_BAT()
   }
   output_value /= count;
 
-  NRF_LOG_INFO("VOLTAGE RAW: %d", output_value);
+  //NRF_LOG_INFO("VOLTAGE RAW: %d", output_value);
   if (voltage < V_BAT_TRHL){
     app_hdw_set_low_bat_led(true);
   }
@@ -492,19 +561,29 @@ void app_hdw_read_V_BAT()
 
 void app_hdw_detect_TAG()
 {
+
   if (app_hdw_read_STCO() == STCO_OK){
+
+    nrf_delay_ms(100);
     if (!(bool)nrf_gpio_pin_read(TAG_PWR_SENS)){
       app_hdw_set_TAG_pwr(true);
+      NRF_LOG_INFO("TAG NOT POWERED");
     }
-      app_hdw_set_TAG_pwr(false);
+    else {
+      //app_hdw_set_TAG_pwr(false);
+      NRF_LOG_INFO("TAG POWERED");
+    }
+  NRF_LOG_INFO("TAG Detected");
   }
-    NRF_LOG_INFO("TAG Detection");
+  else {
+    app_hdw_set_TAG_pwr(false);
+  }
 
 }
 
 STARTCO_t app_hdw_read_STCO() {
   STARTCO_t STCO_state = STCO_ERROR;
-  if ((bool)nrf_gpio_pin_read(STCO_OK_PIN)){
+  if (nrf_gpio_pin_read(STCO_OK_PIN)){
     STCO_state = STCO_OK;
   }
   else if ((bool)nrf_gpio_pin_read(STCO_OPEN_Z_PIN)) {
@@ -541,7 +620,7 @@ void buttons_interrupt_init(void)
 void UART_button_interrupt_init(void) {
 
   nrf_drv_gpiote_in_config_t in_config = GPIOTE_CONFIG_IN_SENSE_HITOLO(false);
-  in_config.pull = NRF_GPIO_PIN_PULLUP;
+  in_config.pull = NRF_GPIO_PIN_NOPULL;
 
   nrf_drv_gpiote_in_init(UART_SELECTOR_BTN, &in_config, app_hdw_read_UART_BTN);
 
@@ -550,9 +629,17 @@ void UART_button_interrupt_init(void) {
 void mode_button_interrupt_init(void) {
 
   nrf_drv_gpiote_in_config_t in_config = GPIOTE_CONFIG_IN_SENSE_HITOLO(false);
-  in_config.pull = NRF_GPIO_PIN_PULLUP;
+  in_config.pull = NRF_GPIO_PIN_NOPULL;
 
   nrf_drv_gpiote_in_init(MODE_SELECTOR_BTN, &in_config, app_hdw_read_mode_BTN);
 }
+
+void app_hdw_set_uart_ble(bool enable) {
+  uart_ble = enable;
+  app_hdw_select_UART();
+  NRF_LOG_INFO("UART_BLE_ENABLE : %d", enable);
+
+}
+
 
 

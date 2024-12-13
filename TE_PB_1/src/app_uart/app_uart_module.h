@@ -22,6 +22,18 @@
 ret_code_t app_uart_init_PB(void);
 
 /**
+ * @brief Function to initialize UART communication between the TAG and the BLE interface.
+ * 
+ */
+ret_code_t app_uart_init_TAG(void);
+
+/**
+ * @brief Function to initialize UART communication between the BAVARD (OW) and the BLE interface.
+ * 
+ */
+ret_code_t app_uart_init_BV(void);
+
+/**
  * @brief Function to write on UART TX buffer.
  *
  */

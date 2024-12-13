@@ -31,19 +31,7 @@ void app_settings_show_config(void)
 {
   // Showing information for debug
   #if APP_SETTINGS_VERBOSE >= 2
-  NRF_LOG_INFO("Smart Liner device configurations:");
-  NRF_LOG_INFO("LoRa heart beat period (min): %d", app_settings_get_lora_heartbeat_period_minutes());
-  NRF_LOG_INFO("Record duration (sec): %d", app_settings_get_record_duration_seconds());
-  NRF_LOG_INFO("Record period (min): %d", app_settings_get_record_period_minutes());
-  NRF_LOG_INFO("FFT period (hr): %d", app_settings_get_fft_period_hours());
-  NRF_LOG_INFO("Accel range (preset): %d", app_settings_get_accelerometer_range());
-  NRF_LOG_INFO("Gyro range (preset): %d", app_settings_get_gyroscope_range());
-  NRF_LOG_INFO("IMU Frequency (preset): %d", app_settings_get_imu_frequency());
-  NRF_LOG_INFO("Channel 0 drive current: %d", app_settings_get_ch0_drive_current());
-  NRF_LOG_INFO("Channel 1 drive current: %d", app_settings_get_ch1_drive_current());
-  NRF_LOG_INFO("Channel 0 settle count: %d", app_settings_get_ch0_settle_count());
-  NRF_LOG_INFO("Channel 1 settle count: %d", app_settings_get_ch1_settle_count());
-  NRF_LOG_INFO("Channel enabled bitmask: %d", app_settings_get_ch_enabled_bitmask());
+  NRF_LOG_INFO("PROGBOARD device configurations:");
   #endif
 }
 

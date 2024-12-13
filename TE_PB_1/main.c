@@ -19,6 +19,7 @@
 #include "app_uart_module.h"
 #include "app_ppi.h"
 #include "app_saadc.h"
+#include "app_communication.h"
 
 // 0 -> No log
 // 1 -> Error only
@@ -34,9 +35,8 @@
 
 
 
-
 int main(void)
-{
+ {
   // TODO: Remove before deployment
   //app_uicr_set(UICR_DEVICE_STATE_ID, 1);
   //app_uicr_set(UICR_PANEL_NO_LSB_ID, (uint32_t) 0x00000002);
@@ -77,7 +77,7 @@ int main(void)
   app_ppi_init();
 
   // Start application execution. 
-  NRF_LOG_INFO("INIT DONE: SMARTLINER APP STARTED!");
+  NRF_LOG_INFO("INIT DONE: PROGBOARD APP STARTED!");
 
   if (!is_ble_user_connected()){
     advertising_stop();
