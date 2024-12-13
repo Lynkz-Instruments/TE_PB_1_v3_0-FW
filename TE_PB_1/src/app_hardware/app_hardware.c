@@ -27,6 +27,7 @@
 uint8_t mode = 0;
 uint8_t uart_conf = 0;
 bool uart_ble = false;
+bool first_UART_CONF = true;
 
 static bool interrupt_initialized = false;
 
@@ -88,6 +89,7 @@ bool app_hdw_init(void)
   log_init();
 
   NRF_LOG_INFO("PROGBOARD FW %s STARTED!", FW_VERSION);
+  nrf_delay_ms(100);
 
   // Get the reset reason
   NRF5_UTILS_GetResetReasons();
@@ -113,7 +115,7 @@ bool app_hdw_init(void)
 
   // Initial condition
   mode = 2;
-  uart_conf = 1;
+  uart_conf = 0;
   app_hdw_select_UART();
   app_hdw_select_mode();
   return true;
@@ -233,6 +235,7 @@ static void gpio_init(void)
   nrf_gpio_cfg(SW3, NRF_GPIO_PIN_DIR_OUTPUT, NRF_GPIO_PIN_INPUT_DISCONNECT, NRF_GPIO_PIN_NOPULL, NRF_GPIO_PIN_S0S1, NRF_GPIO_PIN_NOSENSE);
   nrf_gpio_cfg(SW4_5, NRF_GPIO_PIN_DIR_OUTPUT, NRF_GPIO_PIN_INPUT_DISCONNECT, NRF_GPIO_PIN_NOPULL, NRF_GPIO_PIN_S0S1, NRF_GPIO_PIN_NOSENSE);
   nrf_gpio_cfg(SW6, NRF_GPIO_PIN_DIR_OUTPUT, NRF_GPIO_PIN_INPUT_DISCONNECT, NRF_GPIO_PIN_NOPULL, NRF_GPIO_PIN_S0S1, NRF_GPIO_PIN_NOSENSE);
+  nrf_gpio_cfg_input(21, NRF_GPIO_PIN_PULLUP);
 
   NRF_LOG_INFO("TAG_PIN");
   // TAG power
@@ -242,6 +245,7 @@ static void gpio_init(void)
 
 void app_hdw_select_mode()
 {
+  NRF_LOG_INFO("MODE : %d", mode);
   switch (mode)
   {
   case 0:
@@ -293,7 +297,6 @@ void app_hdw_select_mode()
     break;
   }
   
-  NRF_LOG_INFO("MODE : %d", mode);
 
 }
 
@@ -303,13 +306,20 @@ void app_hdw_select_UART()
   ret_code_t err_code;
 
   if (!uart_ble) {
+  
+    NRF_LOG_INFO("UART : %d", uart_conf);
     switch (uart_conf)
     { 
     case 0:
       app_hdw_set_UART1_led(false);
       app_hdw_set_UART2_led(false);
-      app_ppi_free_channel(0, BV_RX_PIN_NUMBER, UART_TX_PIN_NUMBER);
-
+      if (!first_UART_CONF) {
+        app_ppi_free_channel(0, BV_RX_PIN_NUMBER, UART_TX_PIN_NUMBER);
+        NRF_LOG_INFO("---------------------------LUCAS");
+      }
+      else {
+        first_UART_CONF = false;
+      }
      
       err_code = app_uart_init_PB();
       APP_ERROR_CHECK(err_code);
@@ -341,10 +351,11 @@ void app_hdw_select_UART()
     default:
         break;
     }
-    NRF_LOG_INFO("UART : %d", uart_conf);
 
   }
   else {
+  
+    NRF_LOG_INFO("UART_BLE : %d", uart_conf);
     switch (uart_conf)
     { 
     case 0:
@@ -388,7 +399,6 @@ void app_hdw_select_UART()
         break;
     }
     
-    NRF_LOG_INFO("UART_BLE : %d", uart_conf);
   }
 
 
