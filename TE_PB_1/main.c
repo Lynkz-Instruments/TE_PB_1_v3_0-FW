@@ -77,7 +77,7 @@ int main(void)
   app_ppi_init();
 
   // Start application execution. 
-  NRF_LOG_INFO("INIT DONE: SMARTLINER APP STARTED!");
+  NRF_LOG_INFO("INIT DONE: PROGBOARD APP STARTED!");
 
   if (!is_ble_user_connected()){
     advertising_stop();

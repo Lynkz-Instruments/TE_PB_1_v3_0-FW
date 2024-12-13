@@ -87,7 +87,7 @@ bool app_hdw_init(void)
   // Init logging system.
   log_init();
 
-  NRF_LOG_INFO("SMARTLINERS MAINBOARD FW %s STARTED!", FW_VERSION);
+  NRF_LOG_INFO("PROGBOARD FW %s STARTED!", FW_VERSION);
 
   // Get the reset reason
   NRF5_UTILS_GetResetReasons();
