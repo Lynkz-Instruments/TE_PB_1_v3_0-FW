@@ -89,7 +89,7 @@ bool app_hdw_init(void)
   log_init();
 
   NRF_LOG_INFO("PROGBOARD FW %s STARTED!", FW_VERSION);
-  nrf_delay_ms(100);
+  nrf_delay_ms(100); // Necessary to initialise the NRF52 only when the power is stable.
 
   // Get the reset reason
   NRF5_UTILS_GetResetReasons();
@@ -315,7 +315,6 @@ void app_hdw_select_UART()
       app_hdw_set_UART2_led(false);
       if (!first_UART_CONF) {
         app_ppi_free_channel(0, BV_RX_PIN_NUMBER, UART_TX_PIN_NUMBER);
-        NRF_LOG_INFO("---------------------------LUCAS");
       }
       else {
         first_UART_CONF = false;
