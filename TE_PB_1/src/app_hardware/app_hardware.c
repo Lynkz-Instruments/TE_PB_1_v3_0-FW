@@ -115,7 +115,7 @@ bool app_hdw_init(void)
 
   // Initial condition
   mode = 2;
-  uart_conf = 0;
+  uart_conf = 1;
   app_hdw_select_UART();
   app_hdw_select_mode();
   return true;
@@ -610,8 +610,8 @@ void buttons_interrupt_init(void)
     
 
   }
-  nrf_drv_gpiote_in_event_enable(UART_SELECTOR_BTN, true);
-  nrf_drv_gpiote_in_event_enable(MODE_SELECTOR_BTN, true);
+  //nrf_drv_gpiote_in_event_enable(UART_SELECTOR_BTN, true);
+  //nrf_drv_gpiote_in_event_enable(MODE_SELECTOR_BTN, true);
 
   NRF_LOG_INFO("INTERRUPT_INIT");
 }
