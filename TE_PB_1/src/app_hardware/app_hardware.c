@@ -271,8 +271,8 @@ void app_hdw_select_mode()
     break;
 
   case 2:
-    app_hdw_set_INT_STCO_led(true);
-    app_hdw_set_INT_BV_led(true);
+    //app_hdw_set_INT_STCO_led(true);
+    //app_hdw_set_INT_BV_led(true);
 
     app_hdw_set_analog_switch1(true);
     app_hdw_set_analog_switch2(false);
@@ -326,7 +326,7 @@ void app_hdw_select_UART()
     break;
 
     case 1:
-      app_hdw_set_UART1_led(true);
+     // app_hdw_set_UART1_led(true);
       app_hdw_set_UART2_led(false);
 
       err_code = app_uart_module_uninit();
