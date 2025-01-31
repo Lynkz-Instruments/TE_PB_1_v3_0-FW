@@ -118,6 +118,7 @@ bool app_hdw_init(void)
   uart_conf = 1;
   app_hdw_select_UART();
   app_hdw_select_mode();
+  //app_hdw_select_UART();
   return true;
 }
 
@@ -271,8 +272,8 @@ void app_hdw_select_mode()
     break;
 
   case 2:
-    //app_hdw_set_INT_STCO_led(true);
-    //app_hdw_set_INT_BV_led(true);
+    app_hdw_set_INT_STCO_led(true);
+    app_hdw_set_INT_BV_led(true);
 
     app_hdw_set_analog_switch1(true);
     app_hdw_set_analog_switch2(false);
@@ -322,15 +323,17 @@ void app_hdw_select_UART()
      
       err_code = app_uart_init_PB();
       APP_ERROR_CHECK(err_code);
+      uart_conf = 1 ; 
+      //app_hdw_select_UART();
 
     break;
 
     case 1:
-     // app_hdw_set_UART1_led(true);
+      app_hdw_set_UART1_led(true);
       app_hdw_set_UART2_led(false);
 
+      
       err_code = app_uart_module_uninit();
-      APP_ERROR_CHECK(err_code);
       app_ppi_configure_channel(0, UART_RX_PIN_NUMBER, TAG_TX_PIN_NUMBER);
       app_ppi_configure_channel(1, TAG_RX_PIN_NUMBER, UART_TX_PIN_NUMBER);
 
@@ -516,22 +519,22 @@ void app_hdw_set_TAG_pwr(bool on)
 
 void app_hdw_read_mode_BTN(nrfx_gpiote_pin_t pin, nrf_gpiote_polarity_t action)
 {
-  mode++;
-  if (mode > NB_MODE - 1)
-  {
-    mode = 0;
-  }
-  app_hdw_select_mode();
+  //mode++;
+  //if (mode > NB_MODE - 1)
+  //{
+  //  mode = 0;
+  //}
+  //app_hdw_select_mode();
   //nrf_delay_ms(300); //Si pas de debounce
 }
 
 void app_hdw_read_UART_BTN(nrfx_gpiote_pin_t pin, nrf_gpiote_polarity_t action)
 {
-  uart_conf++;
-  if (uart_conf > NB_UART_CONF - 1){
-    uart_conf = 0;
-  }
-  app_hdw_select_UART();
+  //uart_conf++;
+  //if (uart_conf > NB_UART_CONF - 1){
+  //  uart_conf = 0;
+  //}
+  //app_hdw_select_UART();
   //nrf_delay_ms(300); //Si pas de debounce
 
 }
@@ -610,8 +613,9 @@ void buttons_interrupt_init(void)
     
 
   }
-  //nrf_drv_gpiote_in_event_enable(UART_SELECTOR_BTN, true);
-  //nrf_drv_gpiote_in_event_enable(MODE_SELECTOR_BTN, true);
+
+  nrf_drv_gpiote_in_event_enable(UART_SELECTOR_BTN, true);
+  nrf_drv_gpiote_in_event_enable(MODE_SELECTOR_BTN, true);
 
   NRF_LOG_INFO("INTERRUPT_INIT");
 }
