@@ -24,8 +24,8 @@ extern "C" {
 //UART Default Pin Definition
 #define UART_RX_PIN_NUMBER 5 // ProgBoard's ANNA UART Rx
 #define UART_TX_PIN_NUMBER 4 // ProgBoard's ANNA UART Tx
-#define TAG_RX_PIN_NUMBER 16 // TAG's ANNA UART Rx
-#define TAG_TX_PIN_NUMBER 18 // TAG's ANNA UART Tx
+#define TAG_RX_PIN_NUMBER 18 // TAG's ANNA UART Rx
+#define TAG_TX_PIN_NUMBER 16 // TAG's ANNA UART Tx
 #define BV_RX_PIN_NUMBER 14 // Bavard's UART Tx
 
 

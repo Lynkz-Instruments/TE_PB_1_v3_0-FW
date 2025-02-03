@@ -334,8 +334,8 @@ void app_hdw_select_UART()
 
       
       err_code = app_uart_module_uninit();
-      app_ppi_configure_channel(0, UART_RX_PIN_NUMBER, TAG_TX_PIN_NUMBER);
-      app_ppi_configure_channel(1, TAG_RX_PIN_NUMBER, UART_TX_PIN_NUMBER);
+      app_ppi_configure_channel_RX(0, UART_RX_PIN_NUMBER, TAG_RX_PIN_NUMBER);
+      app_ppi_configure_channel(1, TAG_TX_PIN_NUMBER, UART_TX_PIN_NUMBER);
 
     break;
 
