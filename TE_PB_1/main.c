@@ -78,11 +78,11 @@ int main(void)
 
   // Start application execution. 
   NRF_LOG_INFO("INIT DONE: PROGBOARD APP STARTED!");
-
+/*
   if (!is_ble_user_connected()){
     advertising_stop();
     app_task_set_advertising(false);
-  }
+  }*/
 
   // Setup Tasks based on memory config
   setup_tasks();
